@@ -1,0 +1,22 @@
+{
+  "name": "outie",
+  "version": "0.0.1",
+  "description": "Templating",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgrundel/outie.git"
+  },
+  "keywords": [
+    "templating"
+  ],
+  "author": "dgrundel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dgrundel/outie/issues"
+  },
+  "homepage": "https://github.com/dgrundel/outie#readme"
+}
