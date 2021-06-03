@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`outie tokenizer should correctly identify raw tokens 1`] = `
+Array [
+  ModelKeyToken {
+    "content": "greeting",
+  },
+  RawToken {
+    "content": " ",
+  },
+  ModelKeyToken {
+    "content": "name",
+  },
+  RawToken {
+    "content": " ",
+  },
+  RawModelKeyToken {
+    "content": "someHtml",
+  },
+]
+`;
+
+exports[`outie tokenizer should handle a string with a token at end 1`] = `
+Array [
+  RawToken {
+    "content": "hello ",
+  },
+  ModelKeyToken {
+    "content": "token",
+  },
+]
+`;
+
+exports[`outie tokenizer should handle a string with a token at start 1`] = `
+Array [
+  ModelKeyToken {
+    "content": "greeting",
+  },
+  RawToken {
+    "content": " name!",
+  },
+]
+`;
+
+exports[`outie tokenizer should handle a string with only a single token 1`] = `
+Array [
+  ModelKeyToken {
+    "content": "token",
+  },
+]
+`;
+
+exports[`outie tokenizer should handle a string with tokens at start and end 1`] = `
+Array [
+  ModelKeyToken {
+    "content": "greeting",
+  },
+  RawToken {
+    "content": " ",
+  },
+  ModelKeyToken {
+    "content": "name",
+  },
+]
+`;
+
+exports[`outie tokenizer should tokenize a simple token 1`] = `
+Array [
+  RawToken {
+    "content": "Hello, ",
+  },
+  ModelKeyToken {
+    "content": "name",
+  },
+  RawToken {
+    "content": "!",
+  },
+]
+`;
+
+exports[`token render should html encode on render 1`] = `"Hello, &lt;script&gt;alert(&#x22;xss&#x22;);&lt;/script&gt; world!"`;
