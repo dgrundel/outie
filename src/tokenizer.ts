@@ -74,19 +74,32 @@ export class Tokenizer {
 
     createToken (content: string): Token {
         const config = this.config;
-        const rawIdent = startsWithIdentifier(content, config.rawTokenIdentifier);
-        if (rawIdent.hasIdentifier) {
-            return new RawModelKeyToken(rawIdent.value);
-        }
 
-        const rawIncludeIdent = startsWithIdentifier(content, config.rawIncludeTokenIdentifier);
-        if (rawIncludeIdent.hasIdentifier) {
-            return new RawIncludeToken(rawIncludeIdent.value);
-        }
-        
-        const includeIdent = startsWithIdentifier(content, config.includeTokenIdentifier);
-        if (includeIdent.hasIdentifier) {
-            return new IncludeToken(includeIdent.value);
+        // map of all identifiers with their corresponding token types
+        const identTypeMap = {
+            [config.rawTokenIdentifier]: RawModelKeyToken,
+            [config.rawIncludeTokenIdentifier]: RawIncludeToken,
+            [config.includeTokenIdentifier]: IncludeToken,
+        };
+
+        // sort identifiers by length, longest first
+        // this avoids cases where we might interpret "includeRaw" as "include"
+        // because it starts with the same string ('include')
+        const orderedIdentifiers = Object.keys(identTypeMap).sort((a, b) => {
+            if (a.length === b.length) {
+                return 0;
+            }
+            return a.length > b.length ? -1 : 1;
+        });
+
+        // test for each identifier
+        for (let i = 0; i < orderedIdentifiers.length; i++) {
+            const identifier = orderedIdentifiers[i];
+            const identInfo = startsWithIdentifier(content, identifier);
+            if (identInfo.hasIdentifier) {
+                const TokenType = identTypeMap[identifier];
+                return new TokenType(identInfo.value);
+            }
         }
 
         return new ModelKeyToken(content);
