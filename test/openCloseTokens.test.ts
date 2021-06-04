@@ -28,4 +28,25 @@ Hello, {name}!
         const actual = await outie.render(`{unless prevVisits}You must be new here.{/unless}`, {});
         expect(actual).toMatchSnapshot();
     });
+
+    it('should throw on missing opening tag', async () => {
+        await expect(async () => {
+            const outie = new Outie();
+            return outie.render(`You must be new here.{/unless}`, {});
+        }).rejects.toMatchObject(new Error('Found closing UnlessToken without opening.'));
+    });
+
+    it('should throw on missing closing tag', async () => {
+        await expect(async () => {
+            const outie = new Outie();
+            return outie.render(`{if foo}You must be new here.`, {});
+        }).rejects.toMatchObject(new Error('Unclosed items in template: IfToken'));
+    });
+
+    it('should throw on tag mismatch', async () => {
+        await expect(async () => {
+            const outie = new Outie();
+            return outie.render(`{if foo}You must be new here.{/unless}`, {});
+        }).rejects.toMatchObject(new Error('Found UnlessToken but IfToken is still open.'));
+    });
 });

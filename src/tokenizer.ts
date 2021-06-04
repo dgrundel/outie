@@ -164,11 +164,11 @@ export class Tokenizer {
             if (token instanceof OpenCloseToken) {
                 if (token.closed) {
                     if (stack.length === 0) {
-                        throw new Error(`Found closing ${token.content} without opening.`);
+                        throw new Error(`Found closing ${token.constructor.name} without opening.`);
                     }
                     const openingToken = stack[stack.length - 1];
                     if (openingToken.constructor !== token.constructor) {
-                        throw new Error(`Found ${token.content} but ${openingToken.content} is still open.`);
+                        throw new Error(`Found ${token.constructor.name} but ${openingToken.constructor.name} is still open.`);
                     }
 
                     stack.pop();
@@ -187,7 +187,7 @@ export class Tokenizer {
         }
 
         if (stack.length > 0) {
-            throw new Error(`Unclosed items in template: \n${stack.map(t => t.content).join('\n')}`);
+            throw new Error(`Unclosed items in template: ${stack.map(t => t.constructor.name).join(', ')}`);
         }
 
         if (i < s.length) {
