@@ -1,5 +1,6 @@
-import { getConfig, OutieConfig } from "./config";
-import { Token, Tokenizer } from "./tokenizer";
+import { getConfig, OutieConfig, RenderModel } from "./config";
+import { Tokenizer } from "./tokenizer";
+import { Template } from "./template";
 
 export class Outie {
     readonly config: OutieConfig;
@@ -12,9 +13,13 @@ export class Outie {
         this.tokenizer = new Tokenizer(config);
     }
 
-    render (template: string, model: Record<string, any>) {
-        const tokens = this.tokenizer.tokenize(template);
+    async render (template: string, model: RenderModel): Promise<string> {
+        const t = await Template.fromString(template, model);
+        return this.tokenizer.renderTemplate(t);
+    }
 
-        return tokens.map(t => t.render(model)).join('');
+    async renderFile (filePath: string, model: RenderModel): Promise<string> {
+        const t = await Template.fromFile(filePath, model);
+        return this.tokenizer.renderTemplate(t);
     }
 }

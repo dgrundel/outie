@@ -1,5 +1,6 @@
-import { OutieConfig } from "./config";
+import { OutieConfig, RenderModel } from "./config";
 import { encodeHtml } from "./encoder";
+import { Template } from "./template";
 
 export abstract class Token {
     readonly content: string;
@@ -8,17 +9,17 @@ export abstract class Token {
         this.content = content;
     }
 
-    abstract render(model: Record<string, any>): string;
+    abstract render(template: Template, tokenizer: Tokenizer): Promise<string>;
 }
 
 export class RawToken extends Token {
-    render() {
+    async render() {
         return this.content;
     }
 }
 
 export class ModelKeyToken extends Token {
-    getValue(model: Record<string, any>): string | undefined {
+    getValue(model: RenderModel): string | undefined {
         const key = this.content.trim();
         if (model.hasOwnProperty(key) && typeof model[key] !== undefined) {
             return model[key].toString ? model[key].toString() : model[key];
@@ -26,17 +27,35 @@ export class ModelKeyToken extends Token {
         return undefined;
     }
 
-    render(model: Record<string, any>) {
-        const value = this.getValue(model);
+    async render(template: Template) {
+        const value = this.getValue(template.model);
         return value ? encodeHtml(value) : '';
     }
 }
 
 export class RawModelKeyToken extends ModelKeyToken {
-    render(model: Record<string, any>) {
-        return this.getValue(model) || '';
+    async render(template: Template) {
+        return this.getValue(template.model) || '';
     }
 }
+
+export class IncludeToken extends Token {
+    async render(template: Template, tokenizer: Tokenizer) {
+        const nested = await Template.fromFile(this.content, template.model, template.dir);
+        return tokenizer.renderTemplate(nested);
+    }
+}
+
+const startsWithIdentifier = (content: string, identifier: string) => {
+    const trimmed = content.trim();
+    const hasIdentifier = trimmed.substring(0, identifier.length) === identifier;
+    const value = trimmed.substring(identifier.length).trim();
+
+    return {
+        hasIdentifier,
+        value,
+    };
+};
 
 export class Tokenizer {
     readonly config: OutieConfig;
@@ -46,12 +65,13 @@ export class Tokenizer {
     }
 
     createToken (content: string): Token {
-        const trimmed = content.trim();
-        const isRaw = trimmed.substring(0, this.config.rawTokenIdentifier.length) === this.config.rawTokenIdentifier;
-        if (isRaw) {
-            return new RawModelKeyToken(
-                trimmed.substring(this.config.rawTokenIdentifier.length)
-            );
+        const rawIdent = startsWithIdentifier(content, this.config.rawTokenIdentifier);
+        if (rawIdent.hasIdentifier) {
+            return new RawModelKeyToken(rawIdent.value);
+        }
+        const includeIdent = startsWithIdentifier(content, this.config.includeTokenIdentifier);
+        if (includeIdent.hasIdentifier) {
+            return new IncludeToken(includeIdent.value);
         }
 
         return new ModelKeyToken(content);
@@ -88,5 +108,15 @@ export class Tokenizer {
         }
     
         return tokens;
+    }
+
+    async renderTokens (tokens: Token[], template: Template): Promise<string> {
+        const rendered = await Promise.all(tokens.map(t => t.render(template, this)));
+        return rendered.join('');
+    }
+
+    async renderTemplate(template: Template) {
+        const tokens = this.tokenize(template.content);
+        return this.renderTokens(tokens, template);
     }
 }

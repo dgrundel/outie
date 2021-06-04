@@ -45,17 +45,16 @@ describe('outie tokenizer', () => {
     it('should correctly identify raw tokens', () => {
         const config = getConfig();
         const tokenizer = new Tokenizer(config);
-        const tokens = tokenizer.tokenize('{greeting} {name} {~someHtml}');
+        const tokens = tokenizer.tokenize('{greeting} {name} {raw someHtml}');
         
         expect(tokens).toMatchSnapshot();
     });
-});
 
-describe('token render', () => {
-    it('should html encode on render', () => {
-        const t = new ModelKeyToken('value');
-        const actual = t.render({ value: 'Hello, <script>alert("xss");</script> world!'});
-
-        expect(actual).toMatchSnapshot();
+    it('should correctly identify include tokens', () => {
+        const config = getConfig();
+        const tokenizer = new Tokenizer(config);
+        const tokens = tokenizer.tokenize('{greeting} {name} {include some.file.html.outie}');
+        
+        expect(tokens).toMatchSnapshot();
     });
 });

@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`outie file handling should handle relative includes 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+<head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Hello, Kate!</h1>
+    <h2>Here's a partial for you, Kate!</h2>
+</body>
+</html>"
+`;
+
+exports[`outie file handling should render a basic template from a file 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+<head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Hello, world!</h1>
+</body>
+</html>"
+`;
