@@ -16,7 +16,8 @@ export interface OutieConfig {
     ifTokenIdentifier: string;
     // unless (if not)
     unlessTokenIdentifier: string;
-
+    // for key:value in items
+    forTokenIdentifier: string;
 }
 
 const defaultConfig: OutieConfig = {
@@ -28,6 +29,7 @@ const defaultConfig: OutieConfig = {
     includeTokenIdentifier: 'include',
     ifTokenIdentifier: 'if',
     unlessTokenIdentifier: 'unless',
+    forTokenIdentifier: 'for',
 };
 
 export const getConfig = (userConfig: Partial<OutieConfig> = {}) => {

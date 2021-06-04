@@ -49,4 +49,29 @@ Hello, {name}!
             return outie.render(`{if foo}You must be new here.{/unless}`, {});
         }).rejects.toMatchObject(new Error('Found UnlessToken but IfToken is still open.'));
     });
+
+    it('should handle a for loop', async () => {
+        const outie = new Outie();
+        const actual = await outie.render(`
+{for color in colors}{color} is my favorite color. No, wait. {/for}
+        `, {
+            colors: ['red', 'green', 'blue']
+        });
+        expect(actual).toMatchSnapshot();
+    });
+
+    it('should handle a for loop with keys, too', async () => {
+        const outie = new Outie();
+        const actual = await outie.render(`
+{for state:city in capitals}
+    The capital of {state} is {city}.
+{/for}
+        `, {
+            capitals: {
+                'Florida': 'Tallahassee',
+                'Washington': 'Olympia',
+            }
+        });
+        expect(actual).toMatchSnapshot();
+    });
 });

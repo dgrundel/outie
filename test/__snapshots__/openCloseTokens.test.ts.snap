@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`outie open-close should handle a for loop 1`] = `
+"
+red is my favorite color. No, wait. green is my favorite color. No, wait. blue is my favorite color. No, wait. 
+        "
+`;
+
+exports[`outie open-close should handle a for loop with keys, too 1`] = `
+"
+
+    The capital of Florida is Tallahassee.
+
+    The capital of Washington is Olympia.
+
+        "
+`;
+
 exports[`outie open-close should handle an if 1`] = `
 "
 Hello, Dave!

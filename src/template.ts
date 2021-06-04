@@ -13,6 +13,14 @@ export class Template {
         this.dir = dir;
     }
 
+    with(extras: RenderModel) {
+        const modelWithExtras = {
+            ...this.model,
+            ...extras
+        };
+        return new Template(this.content, modelWithExtras, this.dir);
+    }
+
     static async fromFile(filePath: string, model: RenderModel, cwd?: string): Promise<Template> {
         const absPath = path.isAbsolute(filePath) || typeof cwd !== 'string'
             ? filePath

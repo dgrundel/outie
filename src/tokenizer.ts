@@ -77,6 +77,32 @@ export class UnlessToken extends OpenCloseToken {
     }
 }
 
+export class ForToken extends OpenCloseToken {
+    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
+        const trimmed = this.content.trim();
+        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\w+)/) || [];
+        const valueVarName = matches[2] ? matches[2] : matches[1];
+        const keyVarName = matches[2] ? matches[1] : undefined;
+        const itemsKey = matches[3];
+
+        if (!(valueVarName && itemsKey)) {
+            throw new Error(`Unrecognized string "${trimmed}" in ${this.constructor.name}. Expected format: "key:value in items" or "value in items"`);
+        }
+
+        const collection = (template.model.hasOwnProperty(itemsKey) && template.model[itemsKey]) || [];
+        const promises = Object.keys(collection).map(k => {
+            const extras = {
+                [valueVarName]: collection[k]
+            };
+            if (keyVarName) {
+                extras[keyVarName] = k;
+            }
+            return tokenizer.renderTokens(this.children, template.with(extras));
+        });
+        return (await Promise.all(promises)).join('');
+    }
+}
+
 const identInfo = (s: string, identifier: string) => {
     const value = s.trim();
     const present = value.startsWith(identifier);
@@ -105,6 +131,7 @@ export class Tokenizer {
             [config.includeTokenIdentifier]: IncludeToken,
             [config.ifTokenIdentifier]: IfToken,
             [config.unlessTokenIdentifier]: UnlessToken,
+            [config.forTokenIdentifier]: ForToken,
         };
 
         // sort identifiers by length, longest first
