@@ -20,11 +20,12 @@ export class RawToken extends Token {
 
 export class ModelKeyToken extends Token {
     getValue(model: RenderModel): string | undefined {
-        const key = this.content.trim();
-        if (model.hasOwnProperty(key) && typeof model[key] !== undefined) {
-            return model[key].toString ? model[key].toString() : model[key];
-        }
-        return undefined;
+        const value = this.content.trim().split('.')
+            .reduce((model: any, key: string) => {
+                return model[key];
+            }, model as any);
+        
+        return typeof value !== 'undefined' ? value.toString() : '';
     }
 
     async render(template: Template) {

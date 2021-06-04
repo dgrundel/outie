@@ -42,4 +42,18 @@ describe('outie', () => {
         const expected = 'Hello, <strong>world</strong>!';
         expect(actual).toStrictEqual(expected);
     });
+
+    it('should allow object property access', async () => {
+        const outie = new Outie();
+        const actual = await outie.render(
+            'Hello, {user.name}!', 
+            { 
+                user: {
+                    name: 'world'
+                }
+            }
+        );
+        const expected = 'Hello, world!';
+        expect(actual).toStrictEqual(expected);
+    });
 });
