@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`outie open-close should handle an if 1`] = `
+"
+Hello, Dave!
+I've seen you here before!
+
+        "
+`;
+
+exports[`outie open-close should handle an if w/ type coercion 1`] = `"You've been here 13 times!"`;
+
+exports[`outie open-close should handle an unless 1`] = `"You must be new here."`;

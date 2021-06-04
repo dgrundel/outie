@@ -47,12 +47,44 @@ export class IncludeToken extends Token {
 }
 
 export class RawIncludeToken extends Token {
-    async render(template: Template, tokenizer: Tokenizer) {
+    async render(template: Template) {
         const nested = await Template.fromFile(this.content, template.model, template.dir);
         // just return the raw file content
         return nested.content;
     }
 }
+
+export abstract class OpenCloseToken extends Token {
+    readonly children: Token[] = [];
+    closed: boolean = false;
+}
+
+export class IfToken extends OpenCloseToken {
+    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
+        const key = this.content.trim();
+        const condition = template.model.hasOwnProperty(key) && template.model[key];
+
+        return condition ? tokenizer.renderTokens(this.children, template) : '';
+    }
+}
+
+export class UnlessToken extends OpenCloseToken {
+    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
+        const key = this.content.trim();
+        const condition = template.model.hasOwnProperty(key) && template.model[key];
+
+        return !condition ? tokenizer.renderTokens(this.children, template) : '';
+    }
+}
+
+const identInfo = (s: string, identifier: string) => {
+    const value = s.trim();
+    const present = value.startsWith(identifier);
+    const trimmed = present
+        ? value.substring(identifier.length).trim()
+        : value;
+    return { present, trimmed };
+};
 
 export class Tokenizer {
     readonly config: OutieConfig;
@@ -63,13 +95,16 @@ export class Tokenizer {
 
     createToken (content: string): Token {
         const config = this.config;
-        const trimmed = content.trim();
+        // this lops off the opening "/" sequence if present
+        const { present: isClosingToken, trimmed } = identInfo(content, config.closeTokenIdentifier);
 
         // map of all identifiers with their corresponding token types
         const identTypeMap = {
             [config.rawTokenIdentifier]: RawModelKeyToken,
             [config.rawIncludeTokenIdentifier]: RawIncludeToken,
             [config.includeTokenIdentifier]: IncludeToken,
+            [config.ifTokenIdentifier]: IfToken,
+            [config.unlessTokenIdentifier]: UnlessToken,
         };
 
         // sort identifiers by length, longest first
@@ -85,12 +120,16 @@ export class Tokenizer {
         // test for each identifier
         for (let i = 0; i < orderedIdentifiers.length; i++) {
             const identifier = orderedIdentifiers[i];
-            const hasIdentifier = trimmed.substring(0, identifier.length) === identifier;
+            const { present, trimmed: tokenContents } = identInfo(trimmed, identifier);
             
-            if (hasIdentifier) {
+            if (present) {
                 const TokenType = identTypeMap[identifier];
-                const tokenContents = trimmed.substring(identifier.length).trim();
-                return new TokenType(tokenContents);
+                const token = new TokenType(tokenContents);
+                if (token instanceof OpenCloseToken) {
+                    token.closed = isClosingToken;
+                }
+
+                return token;
             }
         }
 
@@ -99,6 +138,7 @@ export class Tokenizer {
 
     tokenize (s: string): Token[] {
         const tokens: Token[] = [];
+        const stack: OpenCloseToken[] = [];
         let i = 0;
     
         while (i < s.length) {
@@ -110,17 +150,44 @@ export class Tokenizer {
             if (end === -1) {
                 break;
             }
-    
+            
+            const target = stack.length ? stack[stack.length - 1].children : tokens;
+
             if (i < start) {
-                tokens.push(new RawToken(s.substring(i, start)));
+                target.push(new RawToken(s.substring(i, start)));
             }
             
             const token = this.createToken(
                 s.substring(start + this.config.tokenStart.length, end)
             );
-            tokens.push(token);
+
+            if (token instanceof OpenCloseToken) {
+                if (token.closed) {
+                    if (stack.length === 0) {
+                        throw new Error(`Found closing ${token.content} without opening.`);
+                    }
+                    const openingToken = stack[stack.length - 1];
+                    if (openingToken.constructor !== token.constructor) {
+                        throw new Error(`Found ${token.content} but ${openingToken.content} is still open.`);
+                    }
+
+                    stack.pop();
+                } else {
+                    // opening token
+                    target.push(token);
+                    stack.push(token);
+                }
+            } else {
+                target.push(token);
+            }
+            
+            // tokens.push(token);
     
             i = end + this.config.tokenEnd.length;
+        }
+
+        if (stack.length > 0) {
+            throw new Error(`Unclosed items in template: \n${stack.map(t => t.content).join('\n')}`);
         }
 
         if (i < s.length) {
