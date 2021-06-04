@@ -46,6 +46,14 @@ export class IncludeToken extends Token {
     }
 }
 
+export class RawIncludeToken extends Token {
+    async render(template: Template, tokenizer: Tokenizer) {
+        const nested = await Template.fromFile(this.content, template.model, template.dir);
+        // just return the raw file content
+        return nested.content;
+    }
+}
+
 const startsWithIdentifier = (content: string, identifier: string) => {
     const trimmed = content.trim();
     const hasIdentifier = trimmed.substring(0, identifier.length) === identifier;
@@ -65,11 +73,18 @@ export class Tokenizer {
     }
 
     createToken (content: string): Token {
-        const rawIdent = startsWithIdentifier(content, this.config.rawTokenIdentifier);
+        const config = this.config;
+        const rawIdent = startsWithIdentifier(content, config.rawTokenIdentifier);
         if (rawIdent.hasIdentifier) {
             return new RawModelKeyToken(rawIdent.value);
         }
-        const includeIdent = startsWithIdentifier(content, this.config.includeTokenIdentifier);
+
+        const rawIncludeIdent = startsWithIdentifier(content, config.rawIncludeTokenIdentifier);
+        if (rawIncludeIdent.hasIdentifier) {
+            return new RawIncludeToken(rawIncludeIdent.value);
+        }
+        
+        const includeIdent = startsWithIdentifier(content, config.includeTokenIdentifier);
         if (includeIdent.hasIdentifier) {
             return new IncludeToken(includeIdent.value);
         }

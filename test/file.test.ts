@@ -17,4 +17,12 @@ describe('outie file handling', () => {
         
         expect(actual).toMatchSnapshot();
     });
+
+    it('raw includes are unprocessed', async () => {
+        const outie = new Outie();
+        const filePath = path.resolve(__dirname, '__testData__/rawInclude.html.outie');
+        const actual = await outie.renderFile(filePath, { name: 'Kate' });
+        
+        expect(actual).toMatchSnapshot();
+    });
 });
