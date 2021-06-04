@@ -54,17 +54,6 @@ export class RawIncludeToken extends Token {
     }
 }
 
-const startsWithIdentifier = (content: string, identifier: string) => {
-    const trimmed = content.trim();
-    const hasIdentifier = trimmed.substring(0, identifier.length) === identifier;
-    const value = trimmed.substring(identifier.length).trim();
-
-    return {
-        hasIdentifier,
-        value,
-    };
-};
-
 export class Tokenizer {
     readonly config: OutieConfig;
 
@@ -74,6 +63,7 @@ export class Tokenizer {
 
     createToken (content: string): Token {
         const config = this.config;
+        const trimmed = content.trim();
 
         // map of all identifiers with their corresponding token types
         const identTypeMap = {
@@ -95,10 +85,12 @@ export class Tokenizer {
         // test for each identifier
         for (let i = 0; i < orderedIdentifiers.length; i++) {
             const identifier = orderedIdentifiers[i];
-            const identInfo = startsWithIdentifier(content, identifier);
-            if (identInfo.hasIdentifier) {
+            const hasIdentifier = trimmed.substring(0, identifier.length) === identifier;
+            
+            if (hasIdentifier) {
                 const TokenType = identTypeMap[identifier];
-                return new TokenType(identInfo.value);
+                const tokenContents = trimmed.substring(identifier.length).trim();
+                return new TokenType(tokenContents);
             }
         }
 
