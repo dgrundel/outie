@@ -15,12 +15,7 @@ export abstract class Token {
 
     static getValue(key: string, data: Record<string, any>): any {
         const keyParts = key.trim().split('.');
-        return keyParts.reduce((obj: Record<string, any>, prop: string, i: number) => {
-            if (typeof obj === 'undefined') {
-                throw new Error(`Could not get property "${prop}" of undefined at "${keyParts.slice(0, i).join('.')}".`);
-            }
-            return obj[prop];
-        }, data);
+        return keyParts.reduce((obj: any, prop: string) => typeof obj === 'undefined' ? undefined : obj[prop], data);
     }
 
     static getString(key: string, data: Record<string, any>): string {

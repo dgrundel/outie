@@ -85,6 +85,16 @@ describe('block tokens', () => {
             });
             expect(actual).toMatchSnapshot();
         });
+
+        it('should not throw for missing nested props', async () => {
+            const outie = new Outie();
+            const actual = await outie.render(`{unless user.favorites.color.hex}You have no favorite color?!{/unless}`, { 
+                user: {
+                    name: 'Lisa',
+                }
+            });
+            expect(actual).toMatchSnapshot();
+        });
     });
 
     describe('for', () => {

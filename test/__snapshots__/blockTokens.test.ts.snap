@@ -56,4 +56,6 @@ exports[`block tokens unless should coerce other types 1`] = `"You're new here!"
 
 exports[`block tokens unless should handle a simple unless 1`] = `"You must be new here."`;
 
+exports[`block tokens unless should not throw for missing nested props 1`] = `"You have no favorite color?!"`;
+
 exports[`block tokens unless should support nested props 1`] = `"You're new here!"`;

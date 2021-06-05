@@ -60,12 +60,7 @@ var Token = /** @class */ (function () {
     }
     Token.getValue = function (key, data) {
         var keyParts = key.trim().split('.');
-        return keyParts.reduce(function (obj, prop, i) {
-            if (typeof obj === 'undefined') {
-                throw new Error("Could not get property \"" + prop + "\" of undefined at \"" + keyParts.slice(0, i).join('.') + "\".");
-            }
-            return obj[prop];
-        }, data);
+        return keyParts.reduce(function (obj, prop) { return typeof obj === 'undefined' ? undefined : obj[prop]; }, data);
     };
     Token.getString = function (key, data) {
         var value = Token.getValue(key, data);
