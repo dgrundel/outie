@@ -110,7 +110,7 @@ const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered.trim());
-// The common name of Turdus migratorius is American robin'.
+// The common name of Turdus migratorius is American robin.
 // The common name of Cardinalis cardinalis is Northern cardinal.
 ```
 

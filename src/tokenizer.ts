@@ -10,6 +10,22 @@ export abstract class Token {
     }
 
     abstract render(template: Template, tokenizer: Tokenizer): Promise<string>;
+
+    static getValue(key: string, data: Record<string, any>): any {
+        const keyParts = key.trim().split('.');
+        return keyParts.reduce((obj: Record<string, any>, prop: string, i: number) => {
+            if (typeof obj === 'undefined') {
+                throw new Error(`Could not get property "${prop}" of undefined at "${keyParts.slice(0, i).join('.')}".`);
+            }
+            return obj[prop];
+        }, data);
+    }
+
+    static getString(key: string, data: Record<string, any>): string {
+        const value = Token.getValue(key, data);
+        
+        return typeof value !== 'undefined' ? value.toString() : '';
+    }
 }
 
 export class RawToken extends Token {
@@ -19,24 +35,15 @@ export class RawToken extends Token {
 }
 
 export class ModelKeyToken extends Token {
-    getValue(model: RenderModel): string | undefined {
-        const value = this.content.trim().split('.')
-            .reduce((model: any, key: string) => {
-                return model[key];
-            }, model as any);
-        
-        return typeof value !== 'undefined' ? value.toString() : '';
-    }
-
     async render(template: Template) {
-        const value = this.getValue(template.model);
+        const value = Token.getString(this.content, template.model);
         return value ? encodeHtml(value) : '';
     }
 }
 
 export class RawModelKeyToken extends ModelKeyToken {
     async render(template: Template) {
-        return this.getValue(template.model) || '';
+        return Token.getString(this.content, template.model);
     }
 }
 
@@ -62,26 +69,24 @@ export abstract class OpenCloseToken extends Token {
 
 export class IfToken extends OpenCloseToken {
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        const key = this.content.trim();
-        const condition = template.model.hasOwnProperty(key) && template.model[key];
-
+        const condition = Token.getValue(this.content, template.model);
         return condition ? tokenizer.renderTokens(this.children, template) : '';
     }
 }
 
 export class UnlessToken extends OpenCloseToken {
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        const key = this.content.trim();
-        const condition = template.model.hasOwnProperty(key) && template.model[key];
-
+        const condition = Token.getValue(this.content, template.model);
         return !condition ? tokenizer.renderTokens(this.children, template) : '';
     }
 }
 
 export class ForToken extends OpenCloseToken {
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
+        
+        // first, parse token content
         const trimmed = this.content.trim();
-        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\w+)/) || [];
+        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\S+)/) || [];
         const valueVarName = matches[2] ? matches[2] : matches[1];
         const keyVarName = matches[2] ? matches[1] : undefined;
         const itemsKey = matches[3];
@@ -90,7 +95,13 @@ export class ForToken extends OpenCloseToken {
             throw new Error(`Unrecognized string "${trimmed}" in ${this.constructor.name}. Expected format: "key:value in items" or "value in items"`);
         }
 
-        const collection = (template.model.hasOwnProperty(itemsKey) && template.model[itemsKey]) || [];
+        // find the collection through which we'll iterate
+        const collection = Token.getValue(itemsKey, template.model);
+        if (typeof collection !== 'object') {
+            return '';
+        }
+
+        // render each item
         const promises = Object.keys(collection).map(k => {
             const extras = {
                 [valueVarName]: collection[k]
@@ -100,6 +111,8 @@ export class ForToken extends OpenCloseToken {
             }
             return tokenizer.renderTokens(this.children, template.with(extras));
         });
+
+        // wait for the items to render and join them
         return (await Promise.all(promises)).join('');
     }
 }

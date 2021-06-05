@@ -1,29 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`outie open-close should handle a for loop 1`] = `
+exports[`open-close for should do nothing for non-objects 1`] = `
 "
-red is my favorite color. No, wait. green is my favorite color. No, wait. blue is my favorite color. No, wait. 
-        "
+                
+            "
 `;
 
-exports[`outie open-close should handle a for loop with keys, too 1`] = `
+exports[`open-close for should support nested props 1`] = `
 "
-
-    The capital of Florida is Tallahassee.
-
-    The capital of Washington is Olympia.
-
-        "
+                
+                    The cow goes \\"moo\\".
+                
+                    The chicken goes \\"BOCK\\".
+                
+                    The horse goes \\"neigh\\".
+                
+            "
 `;
 
-exports[`outie open-close should handle an if 1`] = `
+exports[`open-close for should support use of key:value syntax 1`] = `
 "
-Hello, Dave!
-I've seen you here before!
-
-        "
+                
+                    The capital of Florida is Tallahassee.
+                
+                    The capital of Washington is Olympia.
+                
+            "
 `;
 
-exports[`outie open-close should handle an if w/ type coercion 1`] = `"You've been here 13 times!"`;
+exports[`open-close for should support use of value only 1`] = `
+"
+                
+                    red is my favorite color. No, wait.
+                
+                    green is my favorite color. No, wait.
+                
+                    blue is my favorite color. No, wait.
+                
+            "
+`;
 
-exports[`outie open-close should handle an unless 1`] = `"You must be new here."`;
+exports[`open-close if should coerce other types 1`] = `"You've been here 13 times!"`;
+
+exports[`open-close if should handle a simple case 1`] = `
+"
+                Hello, Dave!
+                I've seen you here before!
+                
+            "
+`;
+
+exports[`open-close if should support nested props 1`] = `"You've been here 13 times!"`;
+
+exports[`open-close unless should coerce other types 1`] = `"You're new here!"`;
+
+exports[`open-close unless should handle a simple unless 1`] = `"You must be new here."`;
+
+exports[`open-close unless should support nested props 1`] = `"You're new here!"`;
