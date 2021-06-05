@@ -1,6 +1,8 @@
-import { OutieConfig, RenderModel } from "./config";
+import { OutieConfig } from "./config";
 import { encodeHtml } from "./encoder";
 import { Template } from "./template";
+
+type TokenConstructor = { new (content: string): Token };
 
 export abstract class Token {
     readonly content: string;
@@ -62,41 +64,61 @@ export class RawIncludeToken extends Token {
     }
 }
 
-export abstract class OpenCloseToken extends Token {
+/**
+ * Base class for all tokens that have start and end tags.
+ */
+export abstract class BlockStartToken extends Token {
     readonly children: Token[] = [];
-    closed: boolean = false;
 }
 
-export class IfToken extends OpenCloseToken {
+/**
+ * This is a sort of meta token that is used to signal the 
+ * close of a block (e.g. it's used for "/for", "/if", etc.)
+ */
+export class BlockEndToken extends Token {
+    readonly type: TokenConstructor;
+
+    constructor(type: TokenConstructor) {
+        super('');
+        this.type = type;
+    }
+
+    render(): Promise<string> {
+        throw new Error(`${this.constructor.name}.render should never be called.`);
+    }
+}
+
+export class IfToken extends BlockStartToken {
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
         const condition = Token.getValue(this.content, template.model);
         return condition ? tokenizer.renderTokens(this.children, template) : '';
     }
 }
 
-export class UnlessToken extends OpenCloseToken {
+export class UnlessToken extends BlockStartToken {
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
         const condition = Token.getValue(this.content, template.model);
         return !condition ? tokenizer.renderTokens(this.children, template) : '';
     }
 }
 
-export class ForToken extends OpenCloseToken {
+export class ForToken extends BlockStartToken {
+    readonly valueVarName: string;
+    readonly keyVarName?: string;
+    readonly itemsKey: string;
+
+    constructor(content: string) {
+        super(content);
+
+        const { valueVarName, keyVarName, itemsKey, } = ForToken.parseTokenContent(content);
+        this.valueVarName = valueVarName;
+        this.keyVarName = keyVarName;
+        this.itemsKey = itemsKey;
+    }
+
     async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        
-        // first, parse token content
-        const trimmed = this.content.trim();
-        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\S+)/) || [];
-        const valueVarName = matches[2] ? matches[2] : matches[1];
-        const keyVarName = matches[2] ? matches[1] : undefined;
-        const itemsKey = matches[3];
-
-        if (!(valueVarName && itemsKey)) {
-            throw new Error(`Unrecognized string "${trimmed}" in ${this.constructor.name}. Expected format: "key:value in items" or "value in items"`);
-        }
-
         // find the collection through which we'll iterate
-        const collection = Token.getValue(itemsKey, template.model);
+        const collection = Token.getValue(this.itemsKey, template.model);
         if (typeof collection !== 'object') {
             return '';
         }
@@ -104,16 +126,31 @@ export class ForToken extends OpenCloseToken {
         // render each item
         const promises = Object.keys(collection).map(k => {
             const extras = {
-                [valueVarName]: collection[k]
+                [this.valueVarName]: collection[k]
             };
-            if (keyVarName) {
-                extras[keyVarName] = k;
+            if (this.keyVarName) {
+                extras[this.keyVarName] = k;
             }
             return tokenizer.renderTokens(this.children, template.with(extras));
         });
 
         // wait for the items to render and join them
         return (await Promise.all(promises)).join('');
+    }
+
+    static parseTokenContent(content: string) {
+        const trimmed = content.trim();
+        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\S+)/) || [];
+        const valueVarName = matches[2] ? matches[2] : matches[1];
+        const keyVarName = matches[2] ? matches[1] : undefined;
+        const itemsKey = matches[3];
+
+        if (!(valueVarName && itemsKey)) {
+            throw new Error(`Unrecognized string "${trimmed}" in ${this.constructor.name}.`
+                + '\nExpected format: "key:value in items" or "value in items"');
+        }
+
+        return { valueVarName, keyVarName, itemsKey, };
     }
 }
 
@@ -139,7 +176,7 @@ export class Tokenizer {
         const { present: isClosingToken, trimmed } = identInfo(content, config.closeTokenIdentifier);
 
         // map of all identifiers with their corresponding token types
-        const identTypeMap = {
+        const typeMap: Record<string, TokenConstructor> = {
             [config.rawTokenIdentifier]: RawModelKeyToken,
             [config.rawIncludeTokenIdentifier]: RawIncludeToken,
             [config.includeTokenIdentifier]: IncludeToken,
@@ -151,7 +188,7 @@ export class Tokenizer {
         // sort identifiers by length, longest first
         // this avoids cases where we might interpret "includeRaw" as "include"
         // because it starts with the same string ('include')
-        const orderedIdentifiers = Object.keys(identTypeMap).sort((a, b) => {
+        const orderedIdentifiers = Object.keys(typeMap).sort((a, b) => {
             if (a.length === b.length) {
                 return 0;
             }
@@ -161,16 +198,13 @@ export class Tokenizer {
         // test for each identifier
         for (let i = 0; i < orderedIdentifiers.length; i++) {
             const identifier = orderedIdentifiers[i];
-            const { present, trimmed: tokenContents } = identInfo(trimmed, identifier);
+            const { present: isMatchingType, trimmed: tokenContents } = identInfo(trimmed, identifier);
             
-            if (present) {
-                const TokenType = identTypeMap[identifier];
-                const token = new TokenType(tokenContents);
-                if (token instanceof OpenCloseToken) {
-                    token.closed = isClosingToken;
-                }
-
-                return token;
+            if (isMatchingType) {
+                const TokenType: TokenConstructor = typeMap[identifier];
+                return isClosingToken
+                    ? new BlockEndToken(TokenType)
+                    : new TokenType(tokenContents);
             }
         }
 
@@ -179,7 +213,7 @@ export class Tokenizer {
 
     tokenize (s: string): Token[] {
         const tokens: Token[] = [];
-        const stack: OpenCloseToken[] = [];
+        const stack: BlockStartToken[] = [];
         let i = 0;
     
         while (i < s.length) {
@@ -202,27 +236,24 @@ export class Tokenizer {
                 s.substring(start + this.config.tokenStart.length, end)
             );
 
-            if (token instanceof OpenCloseToken) {
-                if (token.closed) {
-                    if (stack.length === 0) {
-                        throw new Error(`Found closing ${token.constructor.name} without opening.`);
-                    }
-                    const openingToken = stack[stack.length - 1];
-                    if (openingToken.constructor !== token.constructor) {
-                        throw new Error(`Found ${token.constructor.name} but ${openingToken.constructor.name} is still open.`);
-                    }
-
-                    stack.pop();
-                } else {
-                    // opening token
-                    target.push(token);
-                    stack.push(token);
+            if (token instanceof BlockEndToken) {
+                if (stack.length === 0) {
+                    throw new Error(`Found closing ${token.type.name} without opening.`);
                 }
+                const openingToken = stack[stack.length - 1];
+                if (openingToken.constructor !== token.type) {
+                    throw new Error(`Found ${token.type.name} but ${openingToken.constructor.name} is still open.`);
+                }
+
+                stack.pop();
+
+            } else if (token instanceof BlockStartToken) {
+                target.push(token);
+                stack.push(token);
+
             } else {
                 target.push(token);
             }
-            
-            // tokens.push(token);
     
             i = end + this.config.tokenEnd.length;
         }

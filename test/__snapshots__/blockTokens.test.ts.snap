@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`open-close for should do nothing for non-objects 1`] = `
+exports[`block tokens for should do nothing for non-objects 1`] = `
 "
                 
             "
 `;
 
-exports[`open-close for should support nested props 1`] = `
+exports[`block tokens for should support nested props 1`] = `
 "
                 
                     The cow goes \\"moo\\".
@@ -18,7 +18,7 @@ exports[`open-close for should support nested props 1`] = `
             "
 `;
 
-exports[`open-close for should support use of key:value syntax 1`] = `
+exports[`block tokens for should support use of key:value syntax 1`] = `
 "
                 
                     The capital of Florida is Tallahassee.
@@ -28,7 +28,7 @@ exports[`open-close for should support use of key:value syntax 1`] = `
             "
 `;
 
-exports[`open-close for should support use of value only 1`] = `
+exports[`block tokens for should support use of value only 1`] = `
 "
                 
                     red is my favorite color. No, wait.
@@ -40,9 +40,9 @@ exports[`open-close for should support use of value only 1`] = `
             "
 `;
 
-exports[`open-close if should coerce other types 1`] = `"You've been here 13 times!"`;
+exports[`block tokens if should coerce other types 1`] = `"You've been here 13 times!"`;
 
-exports[`open-close if should handle a simple case 1`] = `
+exports[`block tokens if should handle a simple case 1`] = `
 "
                 Hello, Dave!
                 I've seen you here before!
@@ -50,10 +50,10 @@ exports[`open-close if should handle a simple case 1`] = `
             "
 `;
 
-exports[`open-close if should support nested props 1`] = `"You've been here 13 times!"`;
+exports[`block tokens if should support nested props 1`] = `"You've been here 13 times!"`;
 
-exports[`open-close unless should coerce other types 1`] = `"You're new here!"`;
+exports[`block tokens unless should coerce other types 1`] = `"You're new here!"`;
 
-exports[`open-close unless should handle a simple unless 1`] = `"You must be new here."`;
+exports[`block tokens unless should handle a simple unless 1`] = `"You must be new here."`;
 
-exports[`open-close unless should support nested props 1`] = `"You're new here!"`;
+exports[`block tokens unless should support nested props 1`] = `"You're new here!"`;

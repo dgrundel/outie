@@ -1,8 +1,8 @@
 import { Outie } from "../src";
 
-describe('open-close', () => {
+describe('block tokens', () => {
     
-    describe('open-close token parsing', () => {
+    describe('block token parsing', () => {
         it('should throw on missing opening tag', async () => {
             await expect(async () => {
                 const outie = new Outie();
