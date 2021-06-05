@@ -10,6 +10,8 @@ _However_, you have the option to configure almost all of the
 syntax you can see in the usage examples below.
 
 ```typescript
+import { Outie } from 'outie';
+
 // use the default config
 const outie = new Outie();
 
@@ -34,6 +36,8 @@ const custom = new Outie({
 ### Simple string template
 
 ```typescript
+import { Outie } from 'outie';
+
 const template = `Hello, {name}!`;
 const data = { name: 'world' };
 
@@ -51,6 +55,8 @@ console.log(rendered); // "Hello, world!"
 ```
 
 ```typescript
+import { Outie } from 'outie';
+
 const absPath = path.join(__dirname, 'hello.html.outie');
 const data = { name: 'world' };
 
@@ -63,6 +69,8 @@ console.log(rendered); // "<h1>Hello, world!</h1>"
 ### If/Unless
 
 ```typescript
+import { Outie } from 'outie';
+
 const template = `
     {if lastVisit}Welcome back!{/if}
     {unless lastVisit}Welcome!{/unless}
@@ -82,6 +90,8 @@ You can loop through any collection that is iterable using
 the key and the value within the loop.
 
 ```typescript
+import { Outie } from 'outie';
+
 const template = `
     {for key:value in birds}
         The common name of {key} is {value}.
@@ -104,6 +114,8 @@ console.log(rendered.trim());
 
 You can omit the key if you're only interested in the values.
 ```typescript
+import { Outie } from 'outie';
+
 const template = `
     <ul>
     {for city in cities}
@@ -148,6 +160,8 @@ Your balance is {balance}.
 ```
 
 ```typescript
+import { Outie } from 'outie';
+
 const absPath = path.join(__dirname, 'main.html.outie');
 const data = { name: 'world', balance: '$1' };
 
@@ -177,6 +191,8 @@ The contents of this {file} are left unparsed.
 ```
 
 ```typescript
+import { Outie } from 'outie';
+
 const absPath = path.join(__dirname, 'main.html.outie');
 const data = { name: 'world' };
 
@@ -194,6 +210,8 @@ By default, all data is HTML encoded when rendered
 in templates. You can, however, also render data unencoded.
 
 ```typescript
+import { Outie } from 'outie';
+
 const template = `Hello, {raw name}!`;
 const data = { name: '<script>alert("xss");</script>' };
 
