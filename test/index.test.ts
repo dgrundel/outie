@@ -56,4 +56,30 @@ describe('outie', () => {
         const expected = 'Hello, world!';
         expect(actual).toStrictEqual(expected);
     });
+
+    it('should allow deeply nested object property access', async () => {
+        const outie = new Outie();
+        const actual = await outie.render(
+            '{user.brother.cousin.bestFriend.ocelot.name}! {user.brother.cousin.name} he remembers me!', 
+            { 
+                user: {
+                    name: 'Pat',
+                    brother: {
+                        name: 'Steve',
+                        cousin: {
+                            name: 'Lana',
+                            bestFriend: {
+                                name: 'Cheryl',
+                                ocelot: {
+                                    name: 'Babou'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+        const expected = 'Babou! Lana he remembers me!';
+        expect(actual).toStrictEqual(expected);
+    });
 });
