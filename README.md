@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/dgrundel/outie.svg?branch=main)](https://travis-ci.com/dgrundel/outie)
+
 # outie
 
 An _in development_ templating engine for node. Written in TypeScript.
