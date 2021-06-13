@@ -52,7 +52,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RawToken = void 0;
-var Token_1 = require("./Token");
+var Token_1 = require("./core/Token");
 var RawToken = /** @class */ (function (_super) {
     __extends(RawToken, _super);
     function RawToken() {

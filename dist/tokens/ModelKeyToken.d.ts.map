@@ -1,1 +1,1 @@
-{"version":3,"file":"ModelKeyToken.d.ts","sourceRoot":"","sources":["../../src/tokens/ModelKeyToken.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,QAAQ,EAAE,MAAM,aAAa,CAAC;AACvC,OAAO,EAAE,KAAK,EAAE,MAAM,SAAS,CAAC;AAEhC,qBAAa,aAAc,SAAQ,KAAK;IAC9B,MAAM,CAAC,QAAQ,EAAE,QAAQ;CAIlC"}
+{"version":3,"file":"ModelKeyToken.d.ts","sourceRoot":"","sources":["../../src/tokens/ModelKeyToken.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,QAAQ,EAAE,MAAM,aAAa,CAAC;AACvC,OAAO,EAAE,KAAK,EAAE,MAAM,cAAc,CAAC;AAErC,qBAAa,aAAc,SAAQ,KAAK;IAC9B,MAAM,CAAC,QAAQ,EAAE,QAAQ;CAIlC"}

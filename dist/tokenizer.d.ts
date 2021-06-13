@@ -1,6 +1,6 @@
 import { OutieConfig } from "./config";
 import { Template } from "./template";
-import { Token } from './tokens/Token';
+import { Token } from './tokens/core/Token';
 export declare class Tokenizer {
     readonly config: OutieConfig;
     constructor(config: OutieConfig);

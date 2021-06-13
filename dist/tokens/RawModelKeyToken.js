@@ -53,7 +53,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RawModelKeyToken = void 0;
 var ModelKeyToken_1 = require("./ModelKeyToken");
-var Token_1 = require("./Token");
+var Token_1 = require("./core/Token");
 var RawModelKeyToken = /** @class */ (function (_super) {
     __extends(RawModelKeyToken, _super);
     function RawModelKeyToken() {

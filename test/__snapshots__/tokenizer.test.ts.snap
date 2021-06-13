@@ -2,98 +2,133 @@
 
 exports[`outie tokenizer should correctly identify include tokens 1`] = `
 Array [
-  ModelKeyToken {
-    "content": "greeting",
-  },
-  RawToken {
-    "content": " ",
-  },
-  ModelKeyToken {
-    "content": "name",
-  },
-  RawToken {
-    "content": " ",
-  },
-  IncludeToken {
-    "content": "some.file.html.outie",
+  RootToken {
+    "children": Array [
+      ModelKeyToken {
+        "content": "greeting",
+      },
+      RawToken {
+        "content": " ",
+      },
+      ModelKeyToken {
+        "content": "name",
+      },
+      RawToken {
+        "content": " ",
+      },
+      IncludeToken {
+        "content": "some.file.html.outie",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should correctly identify raw tokens 1`] = `
 Array [
-  ModelKeyToken {
-    "content": "greeting",
-  },
-  RawToken {
-    "content": " ",
-  },
-  ModelKeyToken {
-    "content": "name",
-  },
-  RawToken {
-    "content": " ",
-  },
-  RawModelKeyToken {
-    "content": "someHtml",
+  RootToken {
+    "children": Array [
+      ModelKeyToken {
+        "content": "greeting",
+      },
+      RawToken {
+        "content": " ",
+      },
+      ModelKeyToken {
+        "content": "name",
+      },
+      RawToken {
+        "content": " ",
+      },
+      RawModelKeyToken {
+        "content": "someHtml",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should handle a string with a token at end 1`] = `
 Array [
-  RawToken {
-    "content": "hello ",
-  },
-  ModelKeyToken {
-    "content": "token",
+  RootToken {
+    "children": Array [
+      RawToken {
+        "content": "hello ",
+      },
+      ModelKeyToken {
+        "content": "token",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should handle a string with a token at start 1`] = `
 Array [
-  ModelKeyToken {
-    "content": "greeting",
-  },
-  RawToken {
-    "content": " name!",
+  RootToken {
+    "children": Array [
+      ModelKeyToken {
+        "content": "greeting",
+      },
+      RawToken {
+        "content": " name!",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should handle a string with only a single token 1`] = `
 Array [
-  ModelKeyToken {
-    "content": "token",
+  RootToken {
+    "children": Array [
+      ModelKeyToken {
+        "content": "token",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should handle a string with tokens at start and end 1`] = `
 Array [
-  ModelKeyToken {
-    "content": "greeting",
-  },
-  RawToken {
-    "content": " ",
-  },
-  ModelKeyToken {
-    "content": "name",
+  RootToken {
+    "children": Array [
+      ModelKeyToken {
+        "content": "greeting",
+      },
+      RawToken {
+        "content": " ",
+      },
+      ModelKeyToken {
+        "content": "name",
+      },
+    ],
+    "content": "",
   },
 ]
 `;
 
 exports[`outie tokenizer should tokenize a simple token 1`] = `
 Array [
-  RawToken {
-    "content": "Hello, ",
-  },
-  ModelKeyToken {
-    "content": "name",
-  },
-  RawToken {
-    "content": "!",
+  RootToken {
+    "children": Array [
+      RawToken {
+        "content": "Hello, ",
+      },
+      ModelKeyToken {
+        "content": "name",
+      },
+      RawToken {
+        "content": "!",
+      },
+    ],
+    "content": "",
   },
 ]
 `;

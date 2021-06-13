@@ -53,7 +53,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IncludeToken = void 0;
 var template_1 = require("../template");
-var Token_1 = require("./Token");
+var Token_1 = require("./core/Token");
 var IncludeToken = /** @class */ (function (_super) {
     __extends(IncludeToken, _super);
     function IncludeToken() {

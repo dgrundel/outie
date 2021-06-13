@@ -69,7 +69,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Template = void 0;
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
-var Token_1 = require("./tokens/Token");
+var Token_1 = require("./tokens/core/Token");
 var Template = /** @class */ (function () {
     function Template(content, model, tokenizer, dir, tokens) {
         this.content = content;

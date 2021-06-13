@@ -1,4 +1,4 @@
-import { TokenConstructor } from './tokens/Token';
+import { TokenConstructor } from './tokens/core/Token';
 export interface OutieConfig {
     tokenStart: string;
     tokenEnd: string;

@@ -1,6 +1,6 @@
 import { Template } from '../template';
-import { BlockStartToken } from './BlockStartToken';
-import { Token } from './Token';
+import { BlockStartToken } from './core/BlockStartToken';
+import { Token } from './core/Token';
 
 export class IfToken extends BlockStartToken {
     async render(template: Template): Promise<string> {

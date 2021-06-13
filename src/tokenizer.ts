@@ -1,10 +1,11 @@
 import { OutieConfig } from "./config";
 import { Template } from "./template";
-import { BlockEndToken } from './tokens/BlockEndToken';
-import { BlockStartToken } from './tokens/BlockStartToken';
+import { BlockEndToken } from './tokens/core/BlockEndToken';
+import { BlockStartToken } from './tokens/core/BlockStartToken';
 import { ModelKeyToken } from './tokens/ModelKeyToken';
 import { RawToken } from './tokens/RawToken';
-import { Token, TokenConstructor } from './tokens/Token';
+import { Token, TokenConstructor } from './tokens/core/Token';
+import { RootToken } from './tokens/RootToken';
 
 const identInfo = (s: string, identifier: string) => {
     const value = s.trim();
@@ -54,7 +55,7 @@ export class Tokenizer {
     };
 
     tokenize (s: string): Token[] {
-        const tokens: Token[] = [];
+        const root = new RootToken();
         const stack: BlockStartToken[] = [];
         let i = 0;
     
@@ -68,10 +69,10 @@ export class Tokenizer {
                 break;
             }
             
-            const target = stack.length ? stack[stack.length - 1].children : tokens;
+            const parent: BlockStartToken = stack.length ? stack[stack.length - 1] : root;
 
             if (i < start) {
-                target.push(new RawToken(s.substring(i, start)));
+                parent.append(new RawToken(s.substring(i, start)));
             }
             
             const token = this.createToken(
@@ -90,11 +91,11 @@ export class Tokenizer {
                 stack.pop();
 
             } else if (token instanceof BlockStartToken) {
-                target.push(token);
+                parent.append(token);
                 stack.push(token);
 
             } else {
-                target.push(token);
+                parent.append(token);
             }
     
             i = end + this.config.tokenEnd.length;
@@ -105,10 +106,10 @@ export class Tokenizer {
         }
 
         if (i < s.length) {
-            tokens.push(new RawToken(s.substring(i)));
+            root.append(new RawToken(s.substring(i)));
         }
     
-        return tokens;
+        return [root];
     }
 
     async renderTemplate(template: Template) {

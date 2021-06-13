@@ -37,11 +37,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tokenizer = void 0;
-var BlockEndToken_1 = require("./tokens/BlockEndToken");
-var BlockStartToken_1 = require("./tokens/BlockStartToken");
+var BlockEndToken_1 = require("./tokens/core/BlockEndToken");
+var BlockStartToken_1 = require("./tokens/core/BlockStartToken");
 var ModelKeyToken_1 = require("./tokens/ModelKeyToken");
 var RawToken_1 = require("./tokens/RawToken");
-var Token_1 = require("./tokens/Token");
+var Token_1 = require("./tokens/core/Token");
+var RootToken_1 = require("./tokens/RootToken");
 var identInfo = function (s, identifier) {
     var value = s.trim();
     var present = value.startsWith(identifier);
@@ -82,7 +83,7 @@ var Tokenizer = /** @class */ (function () {
     };
     ;
     Tokenizer.prototype.tokenize = function (s) {
-        var tokens = [];
+        var root = new RootToken_1.RootToken();
         var stack = [];
         var i = 0;
         while (i < s.length) {
@@ -94,9 +95,9 @@ var Tokenizer = /** @class */ (function () {
             if (end === -1) {
                 break;
             }
-            var target = stack.length ? stack[stack.length - 1].children : tokens;
+            var parent_1 = stack.length ? stack[stack.length - 1] : root;
             if (i < start) {
-                target.push(new RawToken_1.RawToken(s.substring(i, start)));
+                parent_1.append(new RawToken_1.RawToken(s.substring(i, start)));
             }
             var token = this.createToken(s.substring(start + this.config.tokenStart.length, end));
             if (token instanceof BlockEndToken_1.BlockEndToken) {
@@ -110,11 +111,11 @@ var Tokenizer = /** @class */ (function () {
                 stack.pop();
             }
             else if (token instanceof BlockStartToken_1.BlockStartToken) {
-                target.push(token);
+                parent_1.append(token);
                 stack.push(token);
             }
             else {
-                target.push(token);
+                parent_1.append(token);
             }
             i = end + this.config.tokenEnd.length;
         }
@@ -122,9 +123,9 @@ var Tokenizer = /** @class */ (function () {
             throw new Error("Unclosed items in template: " + stack.map(function (t) { return t.constructor.name; }).join(', '));
         }
         if (i < s.length) {
-            tokens.push(new RawToken_1.RawToken(s.substring(i)));
+            root.append(new RawToken_1.RawToken(s.substring(i)));
         }
-        return tokens;
+        return [root];
     };
     Tokenizer.prototype.renderTemplate = function (template) {
         return __awaiter(this, void 0, void 0, function () {

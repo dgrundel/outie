@@ -1,4 +1,4 @@
-import { Template } from '../template';
+import { Template } from '../../template';
 
 export type TokenConstructor = { new (content: string): Token };
 

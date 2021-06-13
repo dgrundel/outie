@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { RenderModel } from './config';
 import { Tokenizer } from './tokenizer';
-import { Token } from './tokens/Token';
+import { Token } from './tokens/core/Token';
 
 export class Template {
     readonly content: string;

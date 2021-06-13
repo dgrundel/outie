@@ -3,7 +3,7 @@ import { IfToken } from './tokens/IfToken';
 import { IncludeToken } from './tokens/IncludeToken';
 import { RawIncludeToken } from './tokens/RawIncludeToken';
 import { RawModelKeyToken } from './tokens/RawModelKeyToken';
-import { TokenConstructor } from './tokens/Token';
+import { TokenConstructor } from './tokens/core/Token';
 import { UnlessToken } from './tokens/UnlessToken';
 
 export interface OutieConfig {

@@ -1,6 +1,6 @@
 import { RenderModel } from './config';
 import { Tokenizer } from './tokenizer';
-import { Token } from './tokens/Token';
+import { Token } from './tokens/core/Token';
 export declare class Template {
     readonly content: string;
     readonly model: RenderModel;

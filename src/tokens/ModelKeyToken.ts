@@ -1,6 +1,6 @@
 import { encodeHtml } from '../encoder';
 import { Template } from '../template';
-import { Token } from './Token';
+import { Token } from './core/Token';
 
 export class ModelKeyToken extends Token {
     async render(template: Template) {

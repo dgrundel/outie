@@ -1,5 +1,5 @@
 import { Template } from '../template';
-import { Token } from './Token';
+import { Token } from './core/Token';
 
 export class IncludeToken extends Token {
     async render(template: Template) {

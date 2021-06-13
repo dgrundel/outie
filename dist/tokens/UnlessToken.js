@@ -52,8 +52,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnlessToken = void 0;
-var BlockStartToken_1 = require("./BlockStartToken");
-var Token_1 = require("./Token");
+var BlockStartToken_1 = require("./core/BlockStartToken");
+var Token_1 = require("./core/Token");
 var UnlessToken = /** @class */ (function (_super) {
     __extends(UnlessToken, _super);
     function UnlessToken() {
