@@ -1,4 +1,5 @@
 import { Outie } from "../src";
+import { RawModelKeyToken } from '../src/tokens/RawModelKeyToken';
 
 describe('outie', () => {
     it('should render a basic template', async () => {
@@ -22,7 +23,9 @@ describe('outie', () => {
         const outie = new Outie({
             tokenStart: '<%',
             tokenEnd: '%>',
-            rawTokenIdentifier: '~'
+            tokens: {
+                '~': RawModelKeyToken,
+            }
         });
         const actual = await outie.render('Hello, <%~name%>!', { name: '<b>world</b>' });
         const expected = 'Hello, <b>world</b>!';
@@ -81,5 +84,19 @@ describe('outie', () => {
         );
         const expected = 'Babou! Lana he remembers me!';
         expect(actual).toStrictEqual(expected);
+    });
+
+    it('should support reusing templates', async () => {
+        const outie = new Outie();
+        const t = await outie.template('Hello, {name}!', {});
+
+        expect(await t.withExtras({ name: 'Angela' }).render())
+            .toStrictEqual('Hello, Angela!');
+
+        expect(await t.withExtras({ name: 'Brian' }).render())
+            .toStrictEqual('Hello, Brian!');
+        
+        expect(await t.withExtras({ name: 'Candice' }).render())
+            .toStrictEqual('Hello, Candice!');
     });
 });

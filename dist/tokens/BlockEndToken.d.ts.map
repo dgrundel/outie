@@ -1,0 +1,1 @@
+{"version":3,"file":"BlockEndToken.d.ts","sourceRoot":"","sources":["../../src/tokens/BlockEndToken.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,gBAAgB,EAAE,MAAM,SAAS,CAAC;AAElD;;;GAGG;AACF,qBAAa,aAAc,SAAQ,KAAK;IACrC,QAAQ,CAAC,IAAI,EAAE,gBAAgB,CAAC;gBAEpB,IAAI,EAAE,gBAAgB;IAKlC,MAAM,IAAI,OAAO,CAAC,MAAM,CAAC;CAG5B"}

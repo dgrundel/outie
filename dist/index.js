@@ -46,12 +46,72 @@ var Outie = /** @class */ (function () {
         this.config = config;
         this.tokenizer = new tokenizer_1.Tokenizer(config);
     }
+    /**
+     * Pre-compile a template string with a base data model.
+     *
+     * If you don't want to supply data immediately, you can pass
+     * an empty map (`{}`) and provide data later using `withExtras`:
+     *
+     * ```
+     * const t = await outie.template('Hello, {name}', {});
+     * const j = t.withExtras({ name: 'Jay' });
+     * const str = await j.render(); // Hello, Jay
+     * ```
+     *
+     * @param template - a template string to compile
+     * @param model - a data model to use for rendering
+     * @returns pre-compiled template
+     */
+    Outie.prototype.template = function (template, model) {
+        return __awaiter(this, void 0, void 0, function () {
+            var t;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, model, this.tokenizer)];
+                    case 1:
+                        t = _a.sent();
+                        t.compile();
+                        return [2 /*return*/, t];
+                }
+            });
+        });
+    };
+    /**
+     * Pre-compile a template from a file with a base data model.
+     *
+     * See `Outie#template` doc for more detail.
+     *
+     * @param filePath - absolute path to template file
+     * @param model - a data model for rendering
+     * @returns pre-compiled template
+     */
+    Outie.prototype.templateFromFile = function (filePath, model) {
+        return __awaiter(this, void 0, void 0, function () {
+            var t;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model, this.tokenizer)];
+                    case 1:
+                        t = _a.sent();
+                        t.compile();
+                        return [2 /*return*/, t];
+                }
+            });
+        });
+    };
+    /**
+     * Render a template string.
+     *
+     * @param template - template string
+     * @param model - data model
+     * @returns - Promise<string>, rendered template
+     */
     Outie.prototype.render = function (template, model) {
         return __awaiter(this, void 0, void 0, function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, model)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, model, this.tokenizer)];
                     case 1:
                         t = _a.sent();
                         return [2 /*return*/, this.tokenizer.renderTemplate(t)];
@@ -59,12 +119,19 @@ var Outie = /** @class */ (function () {
             });
         });
     };
+    /**
+     * Render the contents of a file as a template.
+     *
+     * @param filePath - absolute path to file
+     * @param model - data model
+     * @returns - Promise<string>, rendered template
+     */
     Outie.prototype.renderFile = function (filePath, model) {
         return __awaiter(this, void 0, void 0, function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model, this.tokenizer)];
                     case 1:
                         t = _a.sent();
                         return [2 /*return*/, this.tokenizer.renderTemplate(t)];

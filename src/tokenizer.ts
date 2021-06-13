@@ -1,153 +1,10 @@
 import { OutieConfig } from "./config";
-import { encodeHtml } from "./encoder";
 import { Template } from "./template";
-
-type TokenConstructor = { new (content: string): Token };
-
-export abstract class Token {
-    readonly content: string;
-
-    constructor(content: string) {
-        this.content = content;
-    }
-
-    abstract render(template: Template, tokenizer: Tokenizer): Promise<string>;
-
-    static getValue(key: string, data: Record<string, any>): any {
-        const keyParts = key.trim().split('.');
-        return keyParts.reduce((obj: any, prop: string) => typeof obj === 'undefined' ? undefined : obj[prop], data);
-    }
-
-    static getString(key: string, data: Record<string, any>): string {
-        const value = Token.getValue(key, data);
-        
-        return typeof value !== 'undefined' ? value.toString() : '';
-    }
-}
-
-export class RawToken extends Token {
-    async render() {
-        return this.content;
-    }
-}
-
-export class ModelKeyToken extends Token {
-    async render(template: Template) {
-        const value = Token.getString(this.content, template.model);
-        return value ? encodeHtml(value) : '';
-    }
-}
-
-export class RawModelKeyToken extends ModelKeyToken {
-    async render(template: Template) {
-        return Token.getString(this.content, template.model);
-    }
-}
-
-export class IncludeToken extends Token {
-    async render(template: Template, tokenizer: Tokenizer) {
-        const nested = await Template.fromFile(this.content, template.model, template.dir);
-        return tokenizer.renderTemplate(nested);
-    }
-}
-
-export class RawIncludeToken extends Token {
-    async render(template: Template) {
-        const nested = await Template.fromFile(this.content, template.model, template.dir);
-        // just return the raw file content
-        return nested.content;
-    }
-}
-
-/**
- * Base class for all tokens that have start and end tags.
- */
-export abstract class BlockStartToken extends Token {
-    readonly children: Token[] = [];
-}
-
-/**
- * This is a sort of meta token that is used to signal the 
- * close of a block (e.g. it's used for "/for", "/if", etc.)
- */
-export class BlockEndToken extends Token {
-    readonly type: TokenConstructor;
-
-    constructor(type: TokenConstructor) {
-        super('');
-        this.type = type;
-    }
-
-    render(): Promise<string> {
-        throw new Error(`${this.constructor.name}.render should never be called.`);
-    }
-}
-
-export class IfToken extends BlockStartToken {
-    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        const condition = Token.getValue(this.content, template.model);
-        return condition ? tokenizer.renderTokens(this.children, template) : '';
-    }
-}
-
-export class UnlessToken extends BlockStartToken {
-    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        const condition = Token.getValue(this.content, template.model);
-        return !condition ? tokenizer.renderTokens(this.children, template) : '';
-    }
-}
-
-export class ForToken extends BlockStartToken {
-    readonly valueVarName: string;
-    readonly keyVarName?: string;
-    readonly itemsKey: string;
-
-    constructor(content: string) {
-        super(content);
-
-        const { valueVarName, keyVarName, itemsKey, } = ForToken.parseTokenContent(content);
-        this.valueVarName = valueVarName;
-        this.keyVarName = keyVarName;
-        this.itemsKey = itemsKey;
-    }
-
-    async render(template: Template, tokenizer: Tokenizer): Promise<string> {
-        // find the collection through which we'll iterate
-        const collection = Token.getValue(this.itemsKey, template.model);
-        if (typeof collection !== 'object') {
-            return '';
-        }
-
-        // render each item
-        const promises = Object.keys(collection).map(k => {
-            const extras = {
-                [this.valueVarName]: collection[k]
-            };
-            if (this.keyVarName) {
-                extras[this.keyVarName] = k;
-            }
-            return tokenizer.renderTokens(this.children, template.with(extras));
-        });
-
-        // wait for the items to render and join them
-        return (await Promise.all(promises)).join('');
-    }
-
-    static parseTokenContent(content: string) {
-        const trimmed = content.trim();
-        const matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\S+)/) || [];
-        const valueVarName = matches[2] ? matches[2] : matches[1];
-        const keyVarName = matches[2] ? matches[1] : undefined;
-        const itemsKey = matches[3];
-
-        if (!(valueVarName && itemsKey)) {
-            throw new Error(`Unrecognized string "${trimmed}" in ${this.constructor.name}.`
-                + '\nExpected format: "key:value in items" or "value in items"');
-        }
-
-        return { valueVarName, keyVarName, itemsKey, };
-    }
-}
+import { BlockEndToken } from './tokens/BlockEndToken';
+import { BlockStartToken } from './tokens/BlockStartToken';
+import { ModelKeyToken } from './tokens/ModelKeyToken';
+import { RawToken } from './tokens/RawToken';
+import { Token, TokenConstructor } from './tokens/Token';
 
 const identInfo = (s: string, identifier: string) => {
     const value = s.trim();
@@ -170,20 +27,10 @@ export class Tokenizer {
         // this lops off the opening "/" sequence if present
         const { present: isClosingToken, trimmed } = identInfo(content, config.closeTokenIdentifier);
 
-        // map of all identifiers with their corresponding token types
-        const typeMap: Record<string, TokenConstructor> = {
-            [config.rawTokenIdentifier]: RawModelKeyToken,
-            [config.rawIncludeTokenIdentifier]: RawIncludeToken,
-            [config.includeTokenIdentifier]: IncludeToken,
-            [config.ifTokenIdentifier]: IfToken,
-            [config.unlessTokenIdentifier]: UnlessToken,
-            [config.forTokenIdentifier]: ForToken,
-        };
-
         // sort identifiers by length, longest first
         // this avoids cases where we might interpret "includeRaw" as "include"
         // because it starts with the same string ('include')
-        const orderedIdentifiers = Object.keys(typeMap).sort((a, b) => {
+        const orderedIdentifiers = Object.keys(config.tokens).sort((a, b) => {
             if (a.length === b.length) {
                 return 0;
             }
@@ -196,7 +43,7 @@ export class Tokenizer {
             const { present: isMatchingType, trimmed: tokenContents } = identInfo(trimmed, identifier);
             
             if (isMatchingType) {
-                const TokenType: TokenConstructor = typeMap[identifier];
+                const TokenType: TokenConstructor = config.tokens[identifier];
                 return isClosingToken
                     ? new BlockEndToken(TokenType)
                     : new TokenType(tokenContents);
@@ -264,13 +111,8 @@ export class Tokenizer {
         return tokens;
     }
 
-    async renderTokens (tokens: Token[], template: Template): Promise<string> {
-        const rendered = await Promise.all(tokens.map(t => t.render(template, this)));
-        return rendered.join('');
-    }
-
     async renderTemplate(template: Template) {
         const tokens = this.tokenize(template.content);
-        return this.renderTokens(tokens, template);
+        return Token.renderTokens(tokens, template);
     }
 }

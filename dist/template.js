@@ -69,17 +69,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Template = void 0;
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
+var Token_1 = require("./tokens/Token");
 var Template = /** @class */ (function () {
-    function Template(content, model, dir) {
+    function Template(content, model, tokenizer, dir, tokens) {
         this.content = content;
         this.model = model;
+        this.tokenizer = tokenizer;
         this.dir = dir;
+        this.tokens = tokens;
     }
-    Template.prototype.with = function (extras) {
+    Template.prototype.withExtras = function (extras) {
         var modelWithExtras = __assign(__assign({}, this.model), extras);
-        return new Template(this.content, modelWithExtras, this.dir);
+        return new Template(this.content, modelWithExtras, this.tokenizer, this.dir, this.tokens);
     };
-    Template.fromFile = function (filePath, model, cwd) {
+    Template.prototype.compile = function () {
+        if (!this.tokens) {
+            this.tokens = this.tokenizer.tokenize(this.content);
+        }
+        return this.tokens;
+    };
+    Template.prototype.render = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var tokens;
+            return __generator(this, function (_a) {
+                tokens = this.tokens || this.compile();
+                return [2 /*return*/, Token_1.Token.renderTokens(tokens, this)];
+            });
+        });
+    };
+    Template.fromFile = function (filePath, model, tokenizer, cwd) {
         return __awaiter(this, void 0, void 0, function () {
             var absPath, contents;
             return __generator(this, function (_a) {
@@ -93,15 +111,15 @@ var Template = /** @class */ (function () {
                             })];
                     case 1:
                         contents = _a.sent();
-                        return [2 /*return*/, new Template(contents, model, path.dirname(absPath))];
+                        return [2 /*return*/, new Template(contents, model, tokenizer, path.dirname(absPath))];
                 }
             });
         });
     };
-    Template.fromString = function (content, model) {
+    Template.fromString = function (content, model, tokenizer) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Template(content, model)];
+                return [2 /*return*/, new Template(content, model, tokenizer)];
             });
         });
     };

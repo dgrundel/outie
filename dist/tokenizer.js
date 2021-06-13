@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -51,232 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tokenizer = exports.ForToken = exports.UnlessToken = exports.IfToken = exports.BlockEndToken = exports.BlockStartToken = exports.RawIncludeToken = exports.IncludeToken = exports.RawModelKeyToken = exports.ModelKeyToken = exports.RawToken = exports.Token = void 0;
-var encoder_1 = require("./encoder");
-var template_1 = require("./template");
-var Token = /** @class */ (function () {
-    function Token(content) {
-        this.content = content;
-    }
-    Token.getValue = function (key, data) {
-        var keyParts = key.trim().split('.');
-        return keyParts.reduce(function (obj, prop) { return typeof obj === 'undefined' ? undefined : obj[prop]; }, data);
-    };
-    Token.getString = function (key, data) {
-        var value = Token.getValue(key, data);
-        return typeof value !== 'undefined' ? value.toString() : '';
-    };
-    return Token;
-}());
-exports.Token = Token;
-var RawToken = /** @class */ (function (_super) {
-    __extends(RawToken, _super);
-    function RawToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    RawToken.prototype.render = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.content];
-            });
-        });
-    };
-    return RawToken;
-}(Token));
-exports.RawToken = RawToken;
-var ModelKeyToken = /** @class */ (function (_super) {
-    __extends(ModelKeyToken, _super);
-    function ModelKeyToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    ModelKeyToken.prototype.render = function (template) {
-        return __awaiter(this, void 0, void 0, function () {
-            var value;
-            return __generator(this, function (_a) {
-                value = Token.getString(this.content, template.model);
-                return [2 /*return*/, value ? encoder_1.encodeHtml(value) : ''];
-            });
-        });
-    };
-    return ModelKeyToken;
-}(Token));
-exports.ModelKeyToken = ModelKeyToken;
-var RawModelKeyToken = /** @class */ (function (_super) {
-    __extends(RawModelKeyToken, _super);
-    function RawModelKeyToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    RawModelKeyToken.prototype.render = function (template) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, Token.getString(this.content, template.model)];
-            });
-        });
-    };
-    return RawModelKeyToken;
-}(ModelKeyToken));
-exports.RawModelKeyToken = RawModelKeyToken;
-var IncludeToken = /** @class */ (function (_super) {
-    __extends(IncludeToken, _super);
-    function IncludeToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    IncludeToken.prototype.render = function (template, tokenizer) {
-        return __awaiter(this, void 0, void 0, function () {
-            var nested;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(this.content, template.model, template.dir)];
-                    case 1:
-                        nested = _a.sent();
-                        return [2 /*return*/, tokenizer.renderTemplate(nested)];
-                }
-            });
-        });
-    };
-    return IncludeToken;
-}(Token));
-exports.IncludeToken = IncludeToken;
-var RawIncludeToken = /** @class */ (function (_super) {
-    __extends(RawIncludeToken, _super);
-    function RawIncludeToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    RawIncludeToken.prototype.render = function (template) {
-        return __awaiter(this, void 0, void 0, function () {
-            var nested;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(this.content, template.model, template.dir)];
-                    case 1:
-                        nested = _a.sent();
-                        // just return the raw file content
-                        return [2 /*return*/, nested.content];
-                }
-            });
-        });
-    };
-    return RawIncludeToken;
-}(Token));
-exports.RawIncludeToken = RawIncludeToken;
-/**
- * Base class for all tokens that have start and end tags.
- */
-var BlockStartToken = /** @class */ (function (_super) {
-    __extends(BlockStartToken, _super);
-    function BlockStartToken() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.children = [];
-        return _this;
-    }
-    return BlockStartToken;
-}(Token));
-exports.BlockStartToken = BlockStartToken;
-/**
- * This is a sort of meta token that is used to signal the
- * close of a block (e.g. it's used for "/for", "/if", etc.)
- */
-var BlockEndToken = /** @class */ (function (_super) {
-    __extends(BlockEndToken, _super);
-    function BlockEndToken(type) {
-        var _this = _super.call(this, '') || this;
-        _this.type = type;
-        return _this;
-    }
-    BlockEndToken.prototype.render = function () {
-        throw new Error(this.constructor.name + ".render should never be called.");
-    };
-    return BlockEndToken;
-}(Token));
-exports.BlockEndToken = BlockEndToken;
-var IfToken = /** @class */ (function (_super) {
-    __extends(IfToken, _super);
-    function IfToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    IfToken.prototype.render = function (template, tokenizer) {
-        return __awaiter(this, void 0, void 0, function () {
-            var condition;
-            return __generator(this, function (_a) {
-                condition = Token.getValue(this.content, template.model);
-                return [2 /*return*/, condition ? tokenizer.renderTokens(this.children, template) : ''];
-            });
-        });
-    };
-    return IfToken;
-}(BlockStartToken));
-exports.IfToken = IfToken;
-var UnlessToken = /** @class */ (function (_super) {
-    __extends(UnlessToken, _super);
-    function UnlessToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    UnlessToken.prototype.render = function (template, tokenizer) {
-        return __awaiter(this, void 0, void 0, function () {
-            var condition;
-            return __generator(this, function (_a) {
-                condition = Token.getValue(this.content, template.model);
-                return [2 /*return*/, !condition ? tokenizer.renderTokens(this.children, template) : ''];
-            });
-        });
-    };
-    return UnlessToken;
-}(BlockStartToken));
-exports.UnlessToken = UnlessToken;
-var ForToken = /** @class */ (function (_super) {
-    __extends(ForToken, _super);
-    function ForToken(content) {
-        var _this = _super.call(this, content) || this;
-        var _a = ForToken.parseTokenContent(content), valueVarName = _a.valueVarName, keyVarName = _a.keyVarName, itemsKey = _a.itemsKey;
-        _this.valueVarName = valueVarName;
-        _this.keyVarName = keyVarName;
-        _this.itemsKey = itemsKey;
-        return _this;
-    }
-    ForToken.prototype.render = function (template, tokenizer) {
-        return __awaiter(this, void 0, void 0, function () {
-            var collection, promises;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        collection = Token.getValue(this.itemsKey, template.model);
-                        if (typeof collection !== 'object') {
-                            return [2 /*return*/, ''];
-                        }
-                        promises = Object.keys(collection).map(function (k) {
-                            var _a;
-                            var extras = (_a = {},
-                                _a[_this.valueVarName] = collection[k],
-                                _a);
-                            if (_this.keyVarName) {
-                                extras[_this.keyVarName] = k;
-                            }
-                            return tokenizer.renderTokens(_this.children, template.with(extras));
-                        });
-                        return [4 /*yield*/, Promise.all(promises)];
-                    case 1: 
-                    // wait for the items to render and join them
-                    return [2 /*return*/, (_a.sent()).join('')];
-                }
-            });
-        });
-    };
-    ForToken.parseTokenContent = function (content) {
-        var trimmed = content.trim();
-        var matches = trimmed.match(/(\w+)(?:\:(\w+))?(?:\s+in\s+)(\S+)/) || [];
-        var valueVarName = matches[2] ? matches[2] : matches[1];
-        var keyVarName = matches[2] ? matches[1] : undefined;
-        var itemsKey = matches[3];
-        if (!(valueVarName && itemsKey)) {
-            throw new Error("Unrecognized string \"" + trimmed + "\" in " + this.constructor.name + "."
-                + '\nExpected format: "key:value in items" or "value in items"');
-        }
-        return { valueVarName: valueVarName, keyVarName: keyVarName, itemsKey: itemsKey, };
-    };
-    return ForToken;
-}(BlockStartToken));
-exports.ForToken = ForToken;
+exports.Tokenizer = void 0;
+var BlockEndToken_1 = require("./tokens/BlockEndToken");
+var BlockStartToken_1 = require("./tokens/BlockStartToken");
+var ModelKeyToken_1 = require("./tokens/ModelKeyToken");
+var RawToken_1 = require("./tokens/RawToken");
+var Token_1 = require("./tokens/Token");
 var identInfo = function (s, identifier) {
     var value = s.trim();
     var present = value.startsWith(identifier);
@@ -290,23 +55,13 @@ var Tokenizer = /** @class */ (function () {
         this.config = config;
     }
     Tokenizer.prototype.createToken = function (content) {
-        var _a;
         var config = this.config;
         // this lops off the opening "/" sequence if present
-        var _b = identInfo(content, config.closeTokenIdentifier), isClosingToken = _b.present, trimmed = _b.trimmed;
-        // map of all identifiers with their corresponding token types
-        var typeMap = (_a = {},
-            _a[config.rawTokenIdentifier] = RawModelKeyToken,
-            _a[config.rawIncludeTokenIdentifier] = RawIncludeToken,
-            _a[config.includeTokenIdentifier] = IncludeToken,
-            _a[config.ifTokenIdentifier] = IfToken,
-            _a[config.unlessTokenIdentifier] = UnlessToken,
-            _a[config.forTokenIdentifier] = ForToken,
-            _a);
+        var _a = identInfo(content, config.closeTokenIdentifier), isClosingToken = _a.present, trimmed = _a.trimmed;
         // sort identifiers by length, longest first
         // this avoids cases where we might interpret "includeRaw" as "include"
         // because it starts with the same string ('include')
-        var orderedIdentifiers = Object.keys(typeMap).sort(function (a, b) {
+        var orderedIdentifiers = Object.keys(config.tokens).sort(function (a, b) {
             if (a.length === b.length) {
                 return 0;
             }
@@ -315,15 +70,15 @@ var Tokenizer = /** @class */ (function () {
         // test for each identifier
         for (var i = 0; i < orderedIdentifiers.length; i++) {
             var identifier = orderedIdentifiers[i];
-            var _c = identInfo(trimmed, identifier), isMatchingType = _c.present, tokenContents = _c.trimmed;
+            var _b = identInfo(trimmed, identifier), isMatchingType = _b.present, tokenContents = _b.trimmed;
             if (isMatchingType) {
-                var TokenType = typeMap[identifier];
+                var TokenType = config.tokens[identifier];
                 return isClosingToken
-                    ? new BlockEndToken(TokenType)
+                    ? new BlockEndToken_1.BlockEndToken(TokenType)
                     : new TokenType(tokenContents);
             }
         }
-        return new ModelKeyToken(content);
+        return new ModelKeyToken_1.ModelKeyToken(content);
     };
     ;
     Tokenizer.prototype.tokenize = function (s) {
@@ -341,10 +96,10 @@ var Tokenizer = /** @class */ (function () {
             }
             var target = stack.length ? stack[stack.length - 1].children : tokens;
             if (i < start) {
-                target.push(new RawToken(s.substring(i, start)));
+                target.push(new RawToken_1.RawToken(s.substring(i, start)));
             }
             var token = this.createToken(s.substring(start + this.config.tokenStart.length, end));
-            if (token instanceof BlockEndToken) {
+            if (token instanceof BlockEndToken_1.BlockEndToken) {
                 if (stack.length === 0) {
                     throw new Error("Found closing " + token.type.name + " without opening.");
                 }
@@ -354,7 +109,7 @@ var Tokenizer = /** @class */ (function () {
                 }
                 stack.pop();
             }
-            else if (token instanceof BlockStartToken) {
+            else if (token instanceof BlockStartToken_1.BlockStartToken) {
                 target.push(token);
                 stack.push(token);
             }
@@ -367,30 +122,16 @@ var Tokenizer = /** @class */ (function () {
             throw new Error("Unclosed items in template: " + stack.map(function (t) { return t.constructor.name; }).join(', '));
         }
         if (i < s.length) {
-            tokens.push(new RawToken(s.substring(i)));
+            tokens.push(new RawToken_1.RawToken(s.substring(i)));
         }
         return tokens;
-    };
-    Tokenizer.prototype.renderTokens = function (tokens, template) {
-        return __awaiter(this, void 0, void 0, function () {
-            var rendered;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all(tokens.map(function (t) { return t.render(template, _this); }))];
-                    case 1:
-                        rendered = _a.sent();
-                        return [2 /*return*/, rendered.join('')];
-                }
-            });
-        });
     };
     Tokenizer.prototype.renderTemplate = function (template) {
         return __awaiter(this, void 0, void 0, function () {
             var tokens;
             return __generator(this, function (_a) {
                 tokens = this.tokenize(template.content);
-                return [2 /*return*/, this.renderTokens(tokens, template)];
+                return [2 /*return*/, Token_1.Token.renderTokens(tokens, template)];
             });
         });
     };

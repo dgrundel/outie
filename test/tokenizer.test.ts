@@ -1,5 +1,5 @@
 import { getConfig } from "../src/config";
-import { ModelKeyToken, Token, Tokenizer } from "../src/tokenizer";
+import { Tokenizer } from "../src/tokenizer";
 
 describe('outie tokenizer', () => {
     it('should tokenize a simple token', () => {

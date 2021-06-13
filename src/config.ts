@@ -1,3 +1,11 @@
+import { ForToken } from './tokens/ForToken';
+import { IfToken } from './tokens/IfToken';
+import { IncludeToken } from './tokens/IncludeToken';
+import { RawIncludeToken } from './tokens/RawIncludeToken';
+import { RawModelKeyToken } from './tokens/RawModelKeyToken';
+import { TokenConstructor } from './tokens/Token';
+import { UnlessToken } from './tokens/UnlessToken';
+
 export interface OutieConfig {
     tokenStart: string;
     tokenEnd: string;
@@ -6,30 +14,22 @@ export interface OutieConfig {
     // the sequence that indicates an "end" token
     closeTokenIdentifier: string;
 
-    // raw model accessor
-    rawTokenIdentifier: string;
-    // include raw file contents, no processing
-    rawIncludeTokenIdentifier: string;
-    // include partial
-    includeTokenIdentifier: string;
-    // if
-    ifTokenIdentifier: string;
-    // unless (if not)
-    unlessTokenIdentifier: string;
-    // for key:value in items
-    forTokenIdentifier: string;
+    tokens: Record<string, TokenConstructor>;
 }
 
 const defaultConfig: OutieConfig = {
     tokenStart: '{',
     tokenEnd: '}',
     closeTokenIdentifier: '/',
-    rawTokenIdentifier: 'raw',
-    rawIncludeTokenIdentifier: 'includeRaw',
-    includeTokenIdentifier: 'include',
-    ifTokenIdentifier: 'if',
-    unlessTokenIdentifier: 'unless',
-    forTokenIdentifier: 'for',
+
+    tokens: {
+        'raw': RawModelKeyToken,
+        'includeRaw': RawIncludeToken,
+        'include': IncludeToken,
+        'if': IfToken,
+        'unless': UnlessToken,
+        'for': ForToken,
+    }
 };
 
 export const getConfig = (userConfig: Partial<OutieConfig> = {}) => {
