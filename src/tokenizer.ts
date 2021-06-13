@@ -1,5 +1,4 @@
 import { OutieConfig } from "./config";
-import { Template } from "./template";
 import { BlockEndToken } from './tokens/core/BlockEndToken';
 import { BlockStartToken } from './tokens/core/BlockStartToken';
 import { ModelKeyToken } from './tokens/ModelKeyToken';
@@ -110,10 +109,5 @@ export class Tokenizer {
         }
     
         return [root];
-    }
-
-    async renderTemplate(template: Template) {
-        const tokens = this.tokenize(template.content);
-        return Token.renderTokens(tokens, template);
     }
 }

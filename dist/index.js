@@ -114,7 +114,7 @@ var Outie = /** @class */ (function () {
                     case 0: return [4 /*yield*/, template_1.Template.fromString(template, model, this.tokenizer)];
                     case 1:
                         t = _a.sent();
-                        return [2 /*return*/, this.tokenizer.renderTemplate(t)];
+                        return [2 /*return*/, t.render()];
                 }
             });
         });
@@ -134,7 +134,7 @@ var Outie = /** @class */ (function () {
                     case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model, this.tokenizer)];
                     case 1:
                         t = _a.sent();
-                        return [2 /*return*/, this.tokenizer.renderTemplate(t)];
+                        return [2 /*return*/, t.render()];
                 }
             });
         });

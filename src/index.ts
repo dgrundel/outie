@@ -59,7 +59,7 @@ export class Outie {
      */
     async render (template: string, model: RenderModel): Promise<string> {
         const t = await Template.fromString(template, model, this.tokenizer);
-        return this.tokenizer.renderTemplate(t);
+        return t.render();
     }
 
     /**
@@ -71,6 +71,6 @@ export class Outie {
      */
     async renderFile (filePath: string, model: RenderModel): Promise<string> {
         const t = await Template.fromFile(filePath, model, this.tokenizer);
-        return this.tokenizer.renderTemplate(t);
+        return t.render();
     }
 }
