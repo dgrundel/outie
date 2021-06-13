@@ -59,11 +59,11 @@ var ModelKeyToken = /** @class */ (function (_super) {
     function ModelKeyToken() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    ModelKeyToken.prototype.render = function (template) {
+    ModelKeyToken.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             var value;
             return __generator(this, function (_a) {
-                value = Token_1.Token.getString(this.content, template.model);
+                value = Token_1.Token.getString(this.content, model);
                 return [2 /*return*/, value ? encoder_1.encodeHtml(value) : ''];
             });
         });

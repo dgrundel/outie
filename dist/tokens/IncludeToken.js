@@ -56,18 +56,25 @@ var template_1 = require("../template");
 var Token_1 = require("./core/Token");
 var IncludeToken = /** @class */ (function (_super) {
     __extends(IncludeToken, _super);
-    function IncludeToken() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function IncludeToken(contents, sourceTemplate) {
+        var _this = _super.call(this, contents, sourceTemplate) || this;
+        if (sourceTemplate) {
+            _this.nestedTemplate = template_1.Template.fromFile(_this.content, sourceTemplate.tokenizer, sourceTemplate.dir);
+        }
+        else {
+            throw new Error('IncludeToken requires a sourceTemplate.');
+        }
+        return _this;
     }
-    IncludeToken.prototype.render = function (template) {
+    IncludeToken.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             var nested;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(this.content, template.model, template.tokenizer, template.dir)];
+                    case 0: return [4 /*yield*/, this.nestedTemplate];
                     case 1:
                         nested = _a.sent();
-                        return [2 /*return*/, nested.render()];
+                        return [2 /*return*/, nested.render(model)];
                 }
             });
         });

@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -71,33 +60,28 @@ var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
 var Token_1 = require("./tokens/core/Token");
 var Template = /** @class */ (function () {
-    function Template(content, model, tokenizer, dir, tokens) {
+    function Template(content, tokenizer, dir, tokens) {
         this.content = content;
-        this.model = model;
         this.tokenizer = tokenizer;
         this.dir = dir;
         this.tokens = tokens;
     }
-    Template.prototype.withExtras = function (extras) {
-        var modelWithExtras = __assign(__assign({}, this.model), extras);
-        return new Template(this.content, modelWithExtras, this.tokenizer, this.dir, this.tokens);
-    };
     Template.prototype.compile = function () {
         if (!this.tokens) {
-            this.tokens = this.tokenizer.tokenize(this.content);
+            this.tokens = this.tokenizer.tokenize(this.content, this);
         }
         return this.tokens;
     };
-    Template.prototype.render = function () {
+    Template.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             var tokens;
             return __generator(this, function (_a) {
                 tokens = this.tokens || this.compile();
-                return [2 /*return*/, Token_1.Token.renderTokens(tokens, this)];
+                return [2 /*return*/, Token_1.Token.renderTokens(tokens, model)];
             });
         });
     };
-    Template.fromFile = function (filePath, model, tokenizer, cwd) {
+    Template.fromFile = function (filePath, tokenizer, cwd) {
         return __awaiter(this, void 0, void 0, function () {
             var absPath, contents;
             return __generator(this, function (_a) {
@@ -111,15 +95,15 @@ var Template = /** @class */ (function () {
                             })];
                     case 1:
                         contents = _a.sent();
-                        return [2 /*return*/, new Template(contents, model, tokenizer, path.dirname(absPath))];
+                        return [2 /*return*/, new Template(contents, tokenizer, path.dirname(absPath))];
                 }
             });
         });
     };
-    Template.fromString = function (content, model, tokenizer) {
+    Template.fromString = function (content, tokenizer) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Template(content, model, tokenizer)];
+                return [2 /*return*/, new Template(content, tokenizer)];
             });
         });
     };

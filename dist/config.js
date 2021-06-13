@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getConfig = void 0;
+exports.getConfig = exports.defaultConfig = void 0;
 var ForToken_1 = require("./tokens/ForToken");
 var IfToken_1 = require("./tokens/IfToken");
 var IncludeToken_1 = require("./tokens/IncludeToken");
 var RawIncludeToken_1 = require("./tokens/RawIncludeToken");
 var RawModelKeyToken_1 = require("./tokens/RawModelKeyToken");
 var UnlessToken_1 = require("./tokens/UnlessToken");
-var defaultConfig = {
+exports.defaultConfig = {
     tokenStart: '{',
     tokenEnd: '}',
     closeTokenIdentifier: '/',
@@ -22,7 +22,7 @@ var defaultConfig = {
 };
 var getConfig = function (userConfig) {
     if (userConfig === void 0) { userConfig = {}; }
-    return Object.assign({}, defaultConfig, userConfig);
+    return Object.assign({}, exports.defaultConfig, userConfig);
 };
 exports.getConfig = getConfig;
 //# sourceMappingURL=config.js.map

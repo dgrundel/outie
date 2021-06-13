@@ -1,6 +1,6 @@
-import { Template } from '../template';
+import { RenderModel } from '../config';
 import { BlockStartToken } from './core/BlockStartToken';
 export declare class IfToken extends BlockStartToken {
-    render(template: Template): Promise<string>;
+    render(model: RenderModel): Promise<string>;
 }
 //# sourceMappingURL=IfToken.d.ts.map

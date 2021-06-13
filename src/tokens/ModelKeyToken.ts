@@ -1,10 +1,10 @@
+import { RenderModel } from '../config';
 import { encodeHtml } from '../encoder';
-import { Template } from '../template';
 import { Token } from './core/Token';
 
 export class ModelKeyToken extends Token {
-    async render(template: Template) {
-        const value = Token.getString(this.content, template.model);
+    async render(model: RenderModel) {
+        const value = Token.getString(this.content, model);
         return value ? encodeHtml(value) : '';
     }
 }

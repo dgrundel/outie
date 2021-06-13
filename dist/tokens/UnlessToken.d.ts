@@ -1,6 +1,6 @@
-import { Template } from '../template';
+import { RenderModel } from '../config';
 import { BlockStartToken } from './core/BlockStartToken';
 export declare class UnlessToken extends BlockStartToken {
-    render(template: Template): Promise<string>;
+    render(model: RenderModel): Promise<string>;
 }
 //# sourceMappingURL=UnlessToken.d.ts.map

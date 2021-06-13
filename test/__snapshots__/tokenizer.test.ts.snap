@@ -1,51 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`outie tokenizer should correctly identify include tokens 1`] = `
-Array [
-  RootToken {
-    "children": Array [
-      ModelKeyToken {
-        "content": "greeting",
-      },
-      RawToken {
-        "content": " ",
-      },
-      ModelKeyToken {
-        "content": "name",
-      },
-      RawToken {
-        "content": " ",
-      },
-      IncludeToken {
-        "content": "some.file.html.outie",
-      },
-    ],
-    "content": "",
-  },
-]
-`;
-
 exports[`outie tokenizer should correctly identify raw tokens 1`] = `
 Array [
   RootToken {
     "children": Array [
       ModelKeyToken {
         "content": "greeting",
+        "sourceTemplate": undefined,
       },
       RawToken {
         "content": " ",
+        "sourceTemplate": undefined,
       },
       ModelKeyToken {
         "content": "name",
+        "sourceTemplate": undefined,
       },
       RawToken {
         "content": " ",
+        "sourceTemplate": undefined,
       },
       RawModelKeyToken {
         "content": "someHtml",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;
@@ -56,12 +37,15 @@ Array [
     "children": Array [
       RawToken {
         "content": "hello ",
+        "sourceTemplate": undefined,
       },
       ModelKeyToken {
         "content": "token",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;
@@ -72,12 +56,15 @@ Array [
     "children": Array [
       ModelKeyToken {
         "content": "greeting",
+        "sourceTemplate": undefined,
       },
       RawToken {
         "content": " name!",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;
@@ -88,9 +75,11 @@ Array [
     "children": Array [
       ModelKeyToken {
         "content": "token",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;
@@ -101,15 +90,19 @@ Array [
     "children": Array [
       ModelKeyToken {
         "content": "greeting",
+        "sourceTemplate": undefined,
       },
       RawToken {
         "content": " ",
+        "sourceTemplate": undefined,
       },
       ModelKeyToken {
         "content": "name",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;
@@ -120,15 +113,19 @@ Array [
     "children": Array [
       RawToken {
         "content": "Hello, ",
+        "sourceTemplate": undefined,
       },
       ModelKeyToken {
         "content": "name",
+        "sourceTemplate": undefined,
       },
       RawToken {
         "content": "!",
+        "sourceTemplate": undefined,
       },
     ],
     "content": "",
+    "sourceTemplate": undefined,
   },
 ]
 `;

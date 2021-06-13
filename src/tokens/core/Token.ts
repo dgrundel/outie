@@ -1,18 +1,21 @@
+import { RenderModel } from '../../config';
 import { Template } from '../../template';
 
-export type TokenConstructor = { new (content: string): Token };
+export type TokenConstructor = { new (content: string, sourceTemplate?: Template): Token };
 
 export abstract class Token {
     readonly content: string;
+    readonly sourceTemplate?: Template;
 
-    constructor(content: string) {
+    constructor(content: string, sourceTemplate?: Template) {
         this.content = content;
+        this.sourceTemplate = sourceTemplate;
     }
 
-    abstract render(template: Template): Promise<string>;
+    abstract render(model: RenderModel): Promise<string>;
 
-    static async renderTokens (tokens: Token[], template: Template): Promise<string> {
-        const rendered = await Promise.all(tokens.map(t => t.render(template)));
+    static async renderTokens (tokens: Token[], model: RenderModel): Promise<string> {
+        const rendered = await Promise.all(tokens.map(t => t.render(model)));
         return rendered.join('');
     }
 

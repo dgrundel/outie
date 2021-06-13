@@ -2,6 +2,10 @@ import { getConfig, OutieConfig, RenderModel } from "./config";
 import { Tokenizer } from "./tokenizer";
 import { Template } from "./template";
 
+export { OutieConfig, defaultConfig } from './config';
+export { Token } from './tokens/core/Token';
+export { BlockStartToken } from './tokens/core/BlockStartToken';
+
 export class Outie {
     readonly config: OutieConfig;
     readonly tokenizer: Tokenizer;
@@ -14,38 +18,25 @@ export class Outie {
     }
 
     /**
-     * Pre-compile a template string with a base data model.
-     * 
-     * If you don't want to supply data immediately, you can pass
-     * an empty map (`{}`) and provide data later using `withExtras`:
-     * 
-     * ```
-     * const t = await outie.template('Hello, {name}', {});
-     * const j = t.withExtras({ name: 'Jay' });
-     * const str = await j.render(); // Hello, Jay
-     * ```
+     * Pre-compile a template string
      * 
      * @param template - a template string to compile
-     * @param model - a data model to use for rendering
      * @returns pre-compiled template
      */
-    async template (template: string, model: RenderModel): Promise<Template> {
-        const t = await Template.fromString(template, model, this.tokenizer);
+    async template (template: string): Promise<Template> {
+        const t = await Template.fromString(template, this.tokenizer);
         t.compile();
         return t;
     }
 
     /**
-     * Pre-compile a template from a file with a base data model.
-     * 
-     * See `Outie#template` doc for more detail.
+     * Pre-compile a template from a file
      * 
      * @param filePath - absolute path to template file
-     * @param model - a data model for rendering
      * @returns pre-compiled template
      */
-    async templateFromFile (filePath: string, model: RenderModel): Promise<Template> {
-        const t = await Template.fromFile(filePath, model, this.tokenizer);
+    async templateFromFile (filePath: string): Promise<Template> {
+        const t = await Template.fromFile(filePath, this.tokenizer);
         t.compile();
         return t;
     }
@@ -58,8 +49,8 @@ export class Outie {
      * @returns - Promise<string>, rendered template
      */
     async render (template: string, model: RenderModel): Promise<string> {
-        const t = await Template.fromString(template, model, this.tokenizer);
-        return t.render();
+        const t = await Template.fromString(template, this.tokenizer);
+        return t.render(model);
     }
 
     /**
@@ -70,7 +61,7 @@ export class Outie {
      * @returns - Promise<string>, rendered template
      */
     async renderFile (filePath: string, model: RenderModel): Promise<string> {
-        const t = await Template.fromFile(filePath, model, this.tokenizer);
-        return t.render();
+        const t = await Template.fromFile(filePath, this.tokenizer);
+        return t.render(model);
     }
 }

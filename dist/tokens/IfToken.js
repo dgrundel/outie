@@ -59,12 +59,12 @@ var IfToken = /** @class */ (function (_super) {
     function IfToken() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    IfToken.prototype.render = function (template) {
+    IfToken.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             var condition;
             return __generator(this, function (_a) {
-                condition = Token_1.Token.getValue(this.content, template.model);
-                return [2 /*return*/, condition ? Token_1.Token.renderTokens(this.children, template) : ''];
+                condition = Token_1.Token.getValue(this.content, model);
+                return [2 /*return*/, condition ? Token_1.Token.renderTokens(this.children, model) : ''];
             });
         });
     };

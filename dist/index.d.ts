@@ -1,37 +1,27 @@
 import { OutieConfig, RenderModel } from "./config";
 import { Tokenizer } from "./tokenizer";
 import { Template } from "./template";
+export { OutieConfig, defaultConfig } from './config';
+export { Token } from './tokens/core/Token';
+export { BlockStartToken } from './tokens/core/BlockStartToken';
 export declare class Outie {
     readonly config: OutieConfig;
     readonly tokenizer: Tokenizer;
     constructor(userConfig?: Partial<OutieConfig>);
     /**
-     * Pre-compile a template string with a base data model.
-     *
-     * If you don't want to supply data immediately, you can pass
-     * an empty map (`{}`) and provide data later using `withExtras`:
-     *
-     * ```
-     * const t = await outie.template('Hello, {name}', {});
-     * const j = t.withExtras({ name: 'Jay' });
-     * const str = await j.render(); // Hello, Jay
-     * ```
+     * Pre-compile a template string
      *
      * @param template - a template string to compile
-     * @param model - a data model to use for rendering
      * @returns pre-compiled template
      */
-    template(template: string, model: RenderModel): Promise<Template>;
+    template(template: string): Promise<Template>;
     /**
-     * Pre-compile a template from a file with a base data model.
-     *
-     * See `Outie#template` doc for more detail.
+     * Pre-compile a template from a file
      *
      * @param filePath - absolute path to template file
-     * @param model - a data model for rendering
      * @returns pre-compiled template
      */
-    templateFromFile(filePath: string, model: RenderModel): Promise<Template>;
+    templateFromFile(filePath: string): Promise<Template>;
     /**
      * Render a template string.
      *

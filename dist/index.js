@@ -36,10 +36,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Outie = void 0;
+exports.Outie = exports.BlockStartToken = exports.Token = exports.defaultConfig = void 0;
 var config_1 = require("./config");
 var tokenizer_1 = require("./tokenizer");
 var template_1 = require("./template");
+var config_2 = require("./config");
+Object.defineProperty(exports, "defaultConfig", { enumerable: true, get: function () { return config_2.defaultConfig; } });
+var Token_1 = require("./tokens/core/Token");
+Object.defineProperty(exports, "Token", { enumerable: true, get: function () { return Token_1.Token; } });
+var BlockStartToken_1 = require("./tokens/core/BlockStartToken");
+Object.defineProperty(exports, "BlockStartToken", { enumerable: true, get: function () { return BlockStartToken_1.BlockStartToken; } });
 var Outie = /** @class */ (function () {
     function Outie(userConfig) {
         var config = config_1.getConfig(userConfig);
@@ -47,27 +53,17 @@ var Outie = /** @class */ (function () {
         this.tokenizer = new tokenizer_1.Tokenizer(config);
     }
     /**
-     * Pre-compile a template string with a base data model.
-     *
-     * If you don't want to supply data immediately, you can pass
-     * an empty map (`{}`) and provide data later using `withExtras`:
-     *
-     * ```
-     * const t = await outie.template('Hello, {name}', {});
-     * const j = t.withExtras({ name: 'Jay' });
-     * const str = await j.render(); // Hello, Jay
-     * ```
+     * Pre-compile a template string
      *
      * @param template - a template string to compile
-     * @param model - a data model to use for rendering
      * @returns pre-compiled template
      */
-    Outie.prototype.template = function (template, model) {
+    Outie.prototype.template = function (template) {
         return __awaiter(this, void 0, void 0, function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, model, this.tokenizer)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, this.tokenizer)];
                     case 1:
                         t = _a.sent();
                         t.compile();
@@ -77,20 +73,17 @@ var Outie = /** @class */ (function () {
         });
     };
     /**
-     * Pre-compile a template from a file with a base data model.
-     *
-     * See `Outie#template` doc for more detail.
+     * Pre-compile a template from a file
      *
      * @param filePath - absolute path to template file
-     * @param model - a data model for rendering
      * @returns pre-compiled template
      */
-    Outie.prototype.templateFromFile = function (filePath, model) {
+    Outie.prototype.templateFromFile = function (filePath) {
         return __awaiter(this, void 0, void 0, function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model, this.tokenizer)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, this.tokenizer)];
                     case 1:
                         t = _a.sent();
                         t.compile();
@@ -111,10 +104,10 @@ var Outie = /** @class */ (function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, model, this.tokenizer)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromString(template, this.tokenizer)];
                     case 1:
                         t = _a.sent();
-                        return [2 /*return*/, t.render()];
+                        return [2 /*return*/, t.render(model)];
                 }
             });
         });
@@ -131,10 +124,10 @@ var Outie = /** @class */ (function () {
             var t;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, model, this.tokenizer)];
+                    case 0: return [4 /*yield*/, template_1.Template.fromFile(filePath, this.tokenizer)];
                     case 1:
                         t = _a.sent();
-                        return [2 /*return*/, t.render()];
+                        return [2 /*return*/, t.render(model)];
                 }
             });
         });

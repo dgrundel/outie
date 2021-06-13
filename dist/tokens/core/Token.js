@@ -38,15 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Token = void 0;
 var Token = /** @class */ (function () {
-    function Token(content) {
+    function Token(content, sourceTemplate) {
         this.content = content;
+        this.sourceTemplate = sourceTemplate;
     }
-    Token.renderTokens = function (tokens, template) {
+    Token.renderTokens = function (tokens, model) {
         return __awaiter(this, void 0, void 0, function () {
             var rendered;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all(tokens.map(function (t) { return t.render(template); }))];
+                    case 0: return [4 /*yield*/, Promise.all(tokens.map(function (t) { return t.render(model); }))];
                     case 1:
                         rendered = _a.sent();
                         return [2 /*return*/, rendered.join('')];

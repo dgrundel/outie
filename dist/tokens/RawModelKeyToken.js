@@ -59,10 +59,10 @@ var RawModelKeyToken = /** @class */ (function (_super) {
     function RawModelKeyToken() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    RawModelKeyToken.prototype.render = function (template) {
+    RawModelKeyToken.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, Token_1.Token.getString(this.content, template.model)];
+                return [2 /*return*/, Token_1.Token.getString(this.content, model)];
             });
         });
     };

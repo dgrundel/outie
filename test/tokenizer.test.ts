@@ -1,4 +1,5 @@
 import { getConfig } from "../src/config";
+import { Template } from '../src/template';
 import { Tokenizer } from "../src/tokenizer";
 
 describe('outie tokenizer', () => {
@@ -46,14 +47,6 @@ describe('outie tokenizer', () => {
         const config = getConfig();
         const tokenizer = new Tokenizer(config);
         const tokens = tokenizer.tokenize('{greeting} {name} {raw someHtml}');
-        
-        expect(tokens).toMatchSnapshot();
-    });
-
-    it('should correctly identify include tokens', () => {
-        const config = getConfig();
-        const tokenizer = new Tokenizer(config);
-        const tokens = tokenizer.tokenize('{greeting} {name} {include some.file.html.outie}');
         
         expect(tokens).toMatchSnapshot();
     });

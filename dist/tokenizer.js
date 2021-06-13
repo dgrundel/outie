@@ -18,7 +18,7 @@ var Tokenizer = /** @class */ (function () {
     function Tokenizer(config) {
         this.config = config;
     }
-    Tokenizer.prototype.createToken = function (content) {
+    Tokenizer.prototype.createToken = function (content, sourceTemplate) {
         var config = this.config;
         // this lops off the opening "/" sequence if present
         var _a = identInfo(content, config.closeTokenIdentifier), isClosingToken = _a.present, trimmed = _a.trimmed;
@@ -35,17 +35,18 @@ var Tokenizer = /** @class */ (function () {
         for (var i = 0; i < orderedIdentifiers.length; i++) {
             var identifier = orderedIdentifiers[i];
             var _b = identInfo(trimmed, identifier), isMatchingType = _b.present, tokenContents = _b.trimmed;
+            // found a match, create a token
             if (isMatchingType) {
                 var TokenType = config.tokens[identifier];
                 return isClosingToken
                     ? new BlockEndToken_1.BlockEndToken(TokenType)
-                    : new TokenType(tokenContents);
+                    : new TokenType(tokenContents, sourceTemplate);
             }
         }
         return new ModelKeyToken_1.ModelKeyToken(content);
     };
     ;
-    Tokenizer.prototype.tokenize = function (s) {
+    Tokenizer.prototype.tokenize = function (s, sourceTemplate) {
         var root = new RootToken_1.RootToken();
         var stack = [];
         var i = 0;
@@ -62,7 +63,7 @@ var Tokenizer = /** @class */ (function () {
             if (i < start) {
                 parent_1.append(new RawToken_1.RawToken(s.substring(i, start)));
             }
-            var token = this.createToken(s.substring(start + this.config.tokenStart.length, end));
+            var token = this.createToken(s.substring(start + this.config.tokenStart.length, end), sourceTemplate);
             if (token instanceof BlockEndToken_1.BlockEndToken) {
                 if (stack.length === 0) {
                     throw new Error("Found closing " + token.type.name + " without opening.");

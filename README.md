@@ -12,44 +12,62 @@ _However_, you have the option to configure almost all of the
 syntax you can see in the usage examples below.
 
 ```typescript
-import { Outie } from 'outie';
+import { Outie, defaultConfig } from 'outie';
 
 // use the default config
 const outie = new Outie();
 
 // customize everything
-// (ok, these are the defaults but you 
-// *could* change them if you wanted.)
 const custom = new Outie({
     tokenStart: '{',
     tokenEnd: '}',
     closeTokenIdentifier: '/',
-    rawTokenIdentifier: 'raw',
-    rawIncludeTokenIdentifier: 'includeRaw',
-    includeTokenIdentifier: 'include',
-    ifTokenIdentifier: 'if',
-    unlessTokenIdentifier: 'unless',
-    forTokenIdentifier: 'for',
+    
+    // tokens lets you add, remove, or customize
+    // the set of supported "tokens" (aka tags)
+    tokens: {
+        // you can easily rename the bundled tokens 
+        // using the exported `defaultConfig`
+
+        // rename "raw" token
+        '~': defaultConfig.tokens.raw, 
+        // rename "includeRaw" token
+        'incRaw': defaultConfig.tokens.includeRaw, 
+        // rename "include" token
+        'inc': defaultConfig.tokens.include, 
+        // rename "if" token
+        '?': defaultConfig.tokens.if, 
+        // rename "unless" token
+        '!': defaultConfig.tokens.unless, 
+        // rename "for" token
+        'each': defaultConfig.tokens.for, 
+
+        // you can also supply your own token definitions
+        'random': class RandomToken extends Token {
+            async render() {
+                return Math.random().toString();
+            }
+        }
+    }
 });
 ```
 
-## Usage
+## Basic Usage
 
-### Simple string template
+### Render a simple string template
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const template = `Hello, {name}!`;
 const data = { name: 'world' };
-
-const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered); // "Hello, world!"
 ```
 
-### Template from file
+### Render a template from file
 
 ```html
 <!-- hello.html.outie -->
@@ -58,28 +76,57 @@ console.log(rendered); // "Hello, world!"
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const absPath = path.join(__dirname, 'hello.html.outie');
 const data = { name: 'world' };
-
-const outie = new Outie();
 const rendered = await outie.renderFile(absPath, data);
 
 console.log(rendered); // "<h1>Hello, world!</h1>"
 ```
 
+### Precompiling templates from strings
+
+```typescript
+import { Outie } from 'outie';
+const outie = new Outie();
+
+const templateStr = `Hello, {name}!`;
+const data = { name: 'world' };
+const template = await outie.template(templateStr); // compile template
+const rendered = template.render(data); // render pre-compiled template
+
+console.log(rendered); // "Hello, world!"
+```
+
+### Precompiling templates from files
+
+```typescript
+import { Outie } from 'outie';
+const outie = new Outie();
+
+const absPath = path.join(__dirname, 'hello.html.outie');
+const data = { name: 'world' };
+const template = await outie.templateFromFile(absPath); // compile template
+const rendered = template.render(data); // render pre-compiled template
+
+console.log(rendered); // "Hello, world!"
+```
+
+
+## Logic and Looping
+
 ### If/Unless
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const template = `
     {if lastVisit}Welcome back!{/if}
     {unless lastVisit}Welcome!{/unless}
 `;
 const data = { lastVisit: null };
-
-const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered.trim()); // "Welcome!"
@@ -93,6 +140,7 @@ the key and the value within the loop.
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const template = `
     {for key:value in birds}
@@ -105,8 +153,6 @@ const data = {
         'Cardinalis cardinalis': 'Northern cardinal'
     }
 };
-
-const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered.trim());
@@ -117,6 +163,7 @@ console.log(rendered.trim());
 You can omit the key if you're only interested in the values.
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const template = `
     <ul>
@@ -128,8 +175,6 @@ const template = `
 const data = { 
     cities: ['London', 'Tokyo']
 };
-
-const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered.trim());
@@ -139,7 +184,9 @@ console.log(rendered.trim());
 // </ul>
 ```
 
-### Includes (Partials)
+## Includes/Partials
+
+### Includes
 
 You can include templates from other templates using relative or
 absolute paths. Relative paths are based on the location of the
@@ -163,11 +210,10 @@ Your balance is {balance}.
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const absPath = path.join(__dirname, 'main.html.outie');
 const data = { name: 'world', balance: '$1' };
-
-const outie = new Outie();
 const rendered = await outie.renderFile(absPath, data);
 
 console.log(rendered);
@@ -194,11 +240,10 @@ The contents of this {file} are left unparsed.
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const absPath = path.join(__dirname, 'main.html.outie');
 const data = { name: 'world' };
-
-const outie = new Outie();
 const rendered = await outie.renderFile(absPath, data);
 
 console.log(rendered);
@@ -206,19 +251,50 @@ console.log(rendered);
 // The contents of this {file} are left unparsed.
 ```
 
-### HTML Encoding and raw values
+## HTML Encoding and raw values
 
 By default, all data is HTML encoded when rendered
 in templates. You can, however, also render data unencoded.
 
 ```typescript
 import { Outie } from 'outie';
+const outie = new Outie();
 
 const template = `Hello, {raw name}!`;
 const data = { name: '<script>alert("xss");</script>' };
-
-const outie = new Outie();
 const rendered = await outie.render(template, data);
 
 console.log(rendered); // "Hello, <script>alert("xss");</script>!"
+```
+
+## Extending / Custom Tokens
+
+Here's a complete example of creating a simple custom token.
+
+We start by extending the `abstract class Token`:
+
+```typescript
+import { Token } from 'outie';
+
+class RandomToken extends Token {
+    async render() {
+        return Math.random().toString();
+    }
+}
+```
+
+Then add the token to your config and use it in a template:
+
+```typescript
+import { Outie, defaultConfig } from 'outie';
+
+const outie = new Outie({
+    ...defaultConfig
+    tokens: {
+        ...defaultConfig.tokens,
+        'random': RandomToken
+    }
+});
+
+outie.render('Your number is: {random}', {}); // Your number is: 0.24507892345
 ```

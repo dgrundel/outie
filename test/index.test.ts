@@ -88,15 +88,15 @@ describe('outie', () => {
 
     it('should support reusing templates', async () => {
         const outie = new Outie();
-        const t = await outie.template('Hello, {name}!', {});
+        const t = await outie.template('Hello, {name}!');
 
-        expect(await t.withExtras({ name: 'Angela' }).render())
+        expect(await t.render({ name: 'Angela' }))
             .toStrictEqual('Hello, Angela!');
 
-        expect(await t.withExtras({ name: 'Brian' }).render())
+        expect(await t.render({ name: 'Brian' }))
             .toStrictEqual('Hello, Brian!');
         
-        expect(await t.withExtras({ name: 'Candice' }).render())
+        expect(await t.render({ name: 'Candice' }))
             .toStrictEqual('Hello, Candice!');
     });
 });

@@ -5,6 +5,7 @@ import { ModelKeyToken } from './tokens/ModelKeyToken';
 import { RawToken } from './tokens/RawToken';
 import { Token, TokenConstructor } from './tokens/core/Token';
 import { RootToken } from './tokens/RootToken';
+import { Template } from './template';
 
 const identInfo = (s: string, identifier: string) => {
     const value = s.trim();
@@ -22,7 +23,7 @@ export class Tokenizer {
         this.config = config;
     }
 
-    createToken (content: string): Token {
+    createToken (content: string, sourceTemplate?: Template): Token {
         const config = this.config;
         // this lops off the opening "/" sequence if present
         const { present: isClosingToken, trimmed } = identInfo(content, config.closeTokenIdentifier);
@@ -42,18 +43,19 @@ export class Tokenizer {
             const identifier = orderedIdentifiers[i];
             const { present: isMatchingType, trimmed: tokenContents } = identInfo(trimmed, identifier);
             
+            // found a match, create a token
             if (isMatchingType) {
                 const TokenType: TokenConstructor = config.tokens[identifier];
                 return isClosingToken
                     ? new BlockEndToken(TokenType)
-                    : new TokenType(tokenContents);
+                    : new TokenType(tokenContents, sourceTemplate);
             }
         }
 
         return new ModelKeyToken(content);
     };
 
-    tokenize (s: string): Token[] {
+    tokenize (s: string, sourceTemplate?: Template): Token[] {
         const root = new RootToken();
         const stack: BlockStartToken[] = [];
         let i = 0;
@@ -75,7 +77,8 @@ export class Tokenizer {
             }
             
             const token = this.createToken(
-                s.substring(start + this.config.tokenStart.length, end)
+                s.substring(start + this.config.tokenStart.length, end),
+                sourceTemplate
             );
 
             if (token instanceof BlockEndToken) {

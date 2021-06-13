@@ -1,4 +1,4 @@
-import { Template } from '../template';
+import { RenderModel } from '../config';
 import { BlockStartToken } from './core/BlockStartToken';
 import { Token } from './core/Token';
 
@@ -16,22 +16,23 @@ export class ForToken extends BlockStartToken {
         this.itemsKey = itemsKey;
     }
 
-    async render(template: Template): Promise<string> {
+    async render(model: RenderModel): Promise<string> {
         // find the collection through which we'll iterate
-        const collection = Token.getValue(this.itemsKey, template.model);
+        const collection = Token.getValue(this.itemsKey, model);
         if (typeof collection !== 'object') {
             return '';
         }
 
         // render each item
         const promises = Object.keys(collection).map(k => {
-            const extras = {
+            const withExtras = {
+                ...model,
                 [this.valueVarName]: collection[k]
             };
             if (this.keyVarName) {
-                extras[this.keyVarName] = k;
+                withExtras[this.keyVarName] = k;
             }
-            return Token.renderTokens(this.children, template.withExtras(extras));
+            return Token.renderTokens(this.children, withExtras);
         });
 
         // wait for the items to render and join them

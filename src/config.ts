@@ -17,7 +17,7 @@ export interface OutieConfig {
     tokens: Record<string, TokenConstructor>;
 }
 
-const defaultConfig: OutieConfig = {
+export const defaultConfig: OutieConfig = {
     tokenStart: '{',
     tokenEnd: '}',
     closeTokenIdentifier: '/',
