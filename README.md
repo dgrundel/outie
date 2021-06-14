@@ -8,6 +8,8 @@ A customizable templating engine for node, written in TypeScript.
 
 ### Render a simple string template
 
+[See this example on RunKit.](https://runkit.com/dgrundel/outie-hello-world)
+
 ```typescript
 import { Outie } from 'outie';
 const outie = new Outie();
