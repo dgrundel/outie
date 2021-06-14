@@ -2,55 +2,7 @@
 
 # outie
 
-An _in development_ templating engine for node. Written in TypeScript.
-
-## Configuration
-
-No configuration is required to get started.
-
-_However_, you have the option to configure almost all of the
-syntax you can see in the usage examples below.
-
-```typescript
-import { Outie, defaultConfig } from 'outie';
-
-// use the default config
-const outie = new Outie();
-
-// customize everything
-const custom = new Outie({
-    tokenStart: '{',
-    tokenEnd: '}',
-    closeTokenIdentifier: '/',
-    
-    // tokens lets you add, remove, or customize
-    // the set of supported "tokens" (aka tags)
-    tokens: {
-        // you can easily rename the bundled tokens 
-        // using the exported `defaultConfig`
-
-        // rename "raw" token
-        '~': defaultConfig.tokens.raw, 
-        // rename "includeRaw" token
-        'incRaw': defaultConfig.tokens.includeRaw, 
-        // rename "include" token
-        'inc': defaultConfig.tokens.include, 
-        // rename "if" token
-        '?': defaultConfig.tokens.if, 
-        // rename "unless" token
-        '!': defaultConfig.tokens.unless, 
-        // rename "for" token
-        'each': defaultConfig.tokens.for, 
-
-        // you can also supply your own token definitions
-        'random': class RandomToken extends Token {
-            async render() {
-                return Math.random().toString();
-            }
-        }
-    }
-});
-```
+A customizable templating engine for node, written in TypeScript.
 
 ## Basic usage
 
@@ -67,7 +19,7 @@ const rendered = await outie.render(template, data);
 console.log(rendered); // "Hello, world!"
 ```
 
-### Render a template from file
+### Render a template file
 
 ```html
 <!-- hello.html.outie -->
@@ -85,6 +37,64 @@ const rendered = await outie.renderFile(absPath, data);
 console.log(rendered); // "<h1>Hello, world!</h1>"
 ```
 
+## Configuration
+
+**No configuration is required to get started.**
+
+```typescript
+import { Outie } from 'outie';
+
+// use the default config
+const outie = new Outie();
+```
+
+_However_, you have the option to configure almost all of the
+syntax you can see in the usage examples below.
+
+```typescript
+import { Outie, defaultConfig, MruCache, Template } from 'outie';
+
+// customize everything
+const customConfig = {
+    // these are the defaults
+    tokenStart: '{',
+    tokenEnd: '}',
+    closeTokenIdentifier: '/',
+    
+    // tokens lets you add, remove, or customize
+    // the set of supported "tokens" (aka tags)
+    tokens: {
+        // you can easily rename the bundled tokens 
+        // using the exported `defaultConfig`
+
+        // rename "raw" token to "~"
+        '~': defaultConfig.tokens.raw, 
+        // rename "includeRaw" token to "incRaw"
+        'incRaw': defaultConfig.tokens.includeRaw, 
+        // rename "include" token to "inc"
+        'inc': defaultConfig.tokens.include, 
+        // rename "if" token to "?"
+        '?': defaultConfig.tokens.if, 
+        // rename "unless" token to "!"
+        '!': defaultConfig.tokens.unless, 
+        // rename "for" token to "each"
+        'each': defaultConfig.tokens.for, 
+
+        // you can also create your own token definitions
+        'random': class RandomToken extends Token {
+            async render() {
+                return Math.random().toString();
+            }
+        }
+    },
+
+    // cache up to 100 template files
+    fileCache: new MruCache<Template>(100),
+};
+
+const outie = new Outie(customConfig);
+```
+
 ### Precompiling templates from strings
 
 ```typescript
@@ -94,7 +104,7 @@ const outie = new Outie();
 const templateStr = `Hello, {name}!`;
 const data = { name: 'world' };
 const template = await outie.template(templateStr); // compile template
-const rendered = template.render(data); // render pre-compiled template
+const rendered = await template.render(data); // render pre-compiled template
 
 console.log(rendered); // "Hello, world!"
 ```
@@ -108,7 +118,7 @@ const outie = new Outie();
 const absPath = path.join(__dirname, 'hello.html.outie');
 const data = { name: 'world' };
 const template = await outie.templateFromFile(absPath); // compile template
-const rendered = template.render(data); // render pre-compiled template
+const rendered = await template.render(data); // render pre-compiled template
 
 console.log(rendered); // "Hello, world!"
 ```
@@ -299,7 +309,7 @@ const outie = new Outie({
     }
 });
 
-outie.render('Your number is: {random}', {}); // Your number is: 0.24507892345
+await outie.render('Your number is: {random}', {}); // Your number is: 0.24507892345
 ```
 
 ### Adding parameters
