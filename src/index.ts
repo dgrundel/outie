@@ -3,6 +3,7 @@ import { Tokenizer } from "./tokenizer";
 import { Template } from "./template";
 
 export { OutieConfig, defaultConfig } from './config';
+export { Template } from './template';
 export { Token } from './tokens/core/Token';
 export { BlockStartToken } from './tokens/core/BlockStartToken';
 

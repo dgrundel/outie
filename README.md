@@ -52,7 +52,7 @@ const custom = new Outie({
 });
 ```
 
-## Basic Usage
+## Basic usage
 
 ### Render a simple string template
 
@@ -114,7 +114,7 @@ console.log(rendered); // "Hello, world!"
 ```
 
 
-## Logic and Looping
+## Logic and looping
 
 ### If/Unless
 
@@ -222,7 +222,7 @@ console.log(rendered);
 // Your balance is $1.
 ```
 
-### Raw Includes
+### Raw includes
 
 If you just want to dump the contents of another file into your
 template, you can use a raw include.
@@ -251,7 +251,7 @@ console.log(rendered);
 // The contents of this {file} are left unparsed.
 ```
 
-## HTML Encoding and raw values
+## HTML encoding and raw values
 
 By default, all data is HTML encoded when rendered
 in templates. You can, however, also render data unencoded.
@@ -267,11 +267,14 @@ const rendered = await outie.render(template, data);
 console.log(rendered); // "Hello, <script>alert("xss");</script>!"
 ```
 
-## Extending / Custom Tokens
+## Custom tokens
 
-Here's a complete example of creating a simple custom token.
+### Basic example
 
-We start by extending the `abstract class Token`:
+Here's a complete example of creating a simple custom token 
+that simply outputs a random number when it's used.
+
+We start by extending the `abstract` class `Token`:
 
 ```typescript
 import { Token } from 'outie';
@@ -298,3 +301,79 @@ const outie = new Outie({
 
 outie.render('Your number is: {random}', {}); // Your number is: 0.24507892345
 ```
+
+### Adding parameters
+
+`Math.random()` is great, but it would be _better_ if we could control
+the range of the number that's generated. Let's add some parameters to our
+custom token to do just that.
+
+When we're done, we'll be able to use it like so to get a random number
+between `10` and `20`:
+
+```
+{random 10 20}
+```
+
+We'll use our previous example as a starting point, but add a _constructor_
+and a couple of fields to keep track of the desired min and max.
+
+```typescript
+import { Token, Template } from 'outie';
+
+class RandomToken extends Token {
+    private readonly min: number;
+    private readonly max: number;
+
+    constructor(content: string) {
+        super(content);
+
+        // `content` is the content of the token with the 
+        // _identifier_ stripped away.
+        // So, for "{random 10 20}", `content` is "10 20".
+        const [min, max] = this.content.trim()
+            .split(/\s+/)
+            .map(s => parseInt(s));
+
+        // a "real" implementation would include some
+        // error handling
+        this.min = min;
+        this.max = max;
+    }
+
+    async render() {
+        const n = (Math.random() * (this.max - this.min)) + this.min;
+        return n.toString();
+    }
+}
+```
+
+### Creating a block token
+
+Block tokens are used when a token should have a _start_ and an _end_.
+This is commonly used for looping and conditionals but can be used anywhere
+that you need to handle nested content.
+
+To create a block token, extend the `abstract` class `BlockStartToken`.
+
+As an example, we'll create a simple token that wraps anything inside in
+an `<h1>` element.
+
+Note: Block tokens have full control over the rendering of any child (i.e.
+nested) tokens. If your block token doesn't render its child tokens, they will
+not be rendered.
+
+```typescript
+export class HeadingToken extends BlockStartToken {
+
+    async render(model: RenderModel): Promise<string> {
+        // all child tokens are stored in `this.children`
+        const nestedTokens = this.children;
+        // you can use `Token.renderTokens` to easily render all child tokens
+        const renderedChildren = await Token.renderTokens(nestedTokens, model);
+        
+        return `<h1>${renderedChildren}</h1>`;
+    }
+}
+```
+

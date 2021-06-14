@@ -1,3 +1,4 @@
+import { RenderModel } from '../../config';
 import { Template } from '../../template';
 import { Token } from './Token';
 
@@ -11,7 +12,7 @@ export abstract class BlockStartToken extends Token {
         this.children.push(child);
     }
 
-    async render(template: Template): Promise<string> {
-        return Token.renderTokens(this.children, template);
+    async render(model: RenderModel): Promise<string> {
+        return Token.renderTokens(this.children, model);
     }
 }
