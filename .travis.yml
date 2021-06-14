@@ -1,3 +1,10 @@
 language: node_js
 node_js:
   - lts/*
+deploy:
+  provider: npm
+  edge: true # opt in to dpl v2
+  run_script: release
+  cleanup: false
+  on:
+    tags: true
