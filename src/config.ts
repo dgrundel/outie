@@ -5,6 +5,8 @@ import { RawIncludeToken } from './tokens/RawIncludeToken';
 import { RawModelKeyToken } from './tokens/RawModelKeyToken';
 import { TokenConstructor } from './tokens/core/Token';
 import { UnlessToken } from './tokens/UnlessToken';
+import { Cache, MruCache } from './cache';
+import { Template } from './template';
 
 export interface OutieConfig {
     tokenStart: string;
@@ -15,6 +17,8 @@ export interface OutieConfig {
     closeTokenIdentifier: string;
 
     tokens: Record<string, TokenConstructor>;
+
+    fileCache: Cache<Template>;
 }
 
 export const defaultConfig: OutieConfig = {
@@ -30,6 +34,8 @@ export const defaultConfig: OutieConfig = {
         'unless': UnlessToken,
         'for': ForToken,
     },
+
+    fileCache: new MruCache<Template>(),
 };
 
 export const getConfig = (userConfig: Partial<OutieConfig> = {}) => {

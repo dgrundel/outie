@@ -36,14 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Outie = exports.BlockStartToken = exports.Token = exports.Template = exports.defaultConfig = void 0;
+exports.Outie = exports.BlockStartToken = exports.Token = exports.defaultConfig = void 0;
 var config_1 = require("./config");
 var tokenizer_1 = require("./tokenizer");
 var template_1 = require("./template");
 var config_2 = require("./config");
 Object.defineProperty(exports, "defaultConfig", { enumerable: true, get: function () { return config_2.defaultConfig; } });
-var template_2 = require("./template");
-Object.defineProperty(exports, "Template", { enumerable: true, get: function () { return template_2.Template; } });
 var Token_1 = require("./tokens/core/Token");
 Object.defineProperty(exports, "Token", { enumerable: true, get: function () { return Token_1.Token; } });
 var BlockStartToken_1 = require("./tokens/core/BlockStartToken");

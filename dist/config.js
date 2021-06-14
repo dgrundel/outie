@@ -7,6 +7,7 @@ var IncludeToken_1 = require("./tokens/IncludeToken");
 var RawIncludeToken_1 = require("./tokens/RawIncludeToken");
 var RawModelKeyToken_1 = require("./tokens/RawModelKeyToken");
 var UnlessToken_1 = require("./tokens/UnlessToken");
+var cache_1 = require("./cache");
 exports.defaultConfig = {
     tokenStart: '{',
     tokenEnd: '}',
@@ -19,6 +20,7 @@ exports.defaultConfig = {
         'unless': UnlessToken_1.UnlessToken,
         'for': ForToken_1.ForToken,
     },
+    fileCache: new cache_1.MruCache(),
 };
 var getConfig = function (userConfig) {
     if (userConfig === void 0) { userConfig = {}; }

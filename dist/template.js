@@ -58,8 +58,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Template = void 0;
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
-var cache_1 = require("./cache");
 var Token_1 = require("./tokens/core/Token");
+var getFileContents = function (absPath) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, new Promise(function (resolve, reject) {
+                fs.readFile(absPath, 'utf8', function (err, data) { return err ? reject(err) : resolve(data); });
+            })];
+    });
+}); };
 var Template = /** @class */ (function () {
     function Template(content, tokenizer, dir, tokens) {
         this.content = content;
@@ -82,19 +88,18 @@ var Template = /** @class */ (function () {
     };
     Template.fromFile = function (filePath, tokenizer, cwd) {
         return __awaiter(this, void 0, void 0, function () {
-            var absPath, template;
+            var absPath, fileCache, template;
             var _this = this;
             return __generator(this, function (_a) {
-                absPath = path.isAbsolute(filePath) || typeof cwd !== 'string'
+                absPath = path.resolve(path.isAbsolute(filePath) || typeof cwd !== 'string'
                     ? filePath
-                    : path.join(cwd, filePath);
-                template = Template.fileCache.getOrPut(absPath, function () { return __awaiter(_this, void 0, void 0, function () {
+                    : path.join(cwd, filePath));
+                fileCache = tokenizer.config.fileCache;
+                template = fileCache.getOrPut(absPath, function () { return __awaiter(_this, void 0, void 0, function () {
                     var contents;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4 /*yield*/, new Promise(function (resolve, reject) {
-                                    fs.readFile(path.resolve(absPath), 'utf8', function (err, data) { return err ? reject(err) : resolve(data); });
-                                })];
+                            case 0: return [4 /*yield*/, getFileContents(absPath)];
                             case 1:
                                 contents = _a.sent();
                                 return [2 /*return*/, new Template(contents, tokenizer, path.dirname(absPath))];
@@ -105,14 +110,13 @@ var Template = /** @class */ (function () {
             });
         });
     };
-    Template.fromString = function (content, tokenizer) {
+    Template.fromString = function (content, tokenizer, cwd) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Template(content, tokenizer)];
+                return [2 /*return*/, new Template(content, tokenizer, cwd)];
             });
         });
     };
-    Template.fileCache = new cache_1.MruCache();
     return Template;
 }());
 exports.Template = Template;
