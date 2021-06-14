@@ -66,10 +66,10 @@ var BlockStartToken = /** @class */ (function (_super) {
     BlockStartToken.prototype.append = function (child) {
         this.children.push(child);
     };
-    BlockStartToken.prototype.render = function (template) {
+    BlockStartToken.prototype.render = function (model) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, Token_1.Token.renderTokens(this.children, template)];
+                return [2 /*return*/, Token_1.Token.renderTokens(this.children, model)];
             });
         });
     };

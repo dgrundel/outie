@@ -1,4 +1,10 @@
-export declare class MruCache<T> {
+export interface Cache<T> {
+    has: (key: string) => boolean;
+    put: (key: string, value: T) => void;
+    get: (key: string) => Promise<T | undefined>;
+    getOrPut: (key: string, supplier: () => Promise<T>) => Promise<T>;
+}
+export declare class MruCache<T> implements Cache<T> {
     private readonly maxSize;
     private readonly items;
     private readonly keys;

@@ -18,7 +18,7 @@ exports.defaultConfig = {
         'if': IfToken_1.IfToken,
         'unless': UnlessToken_1.UnlessToken,
         'for': ForToken_1.ForToken,
-    }
+    },
 };
 var getConfig = function (userConfig) {
     if (userConfig === void 0) { userConfig = {}; }
