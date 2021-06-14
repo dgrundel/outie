@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Cache, MruCache } from './cache';
 import { RenderModel } from './config';
 import { Tokenizer } from './tokenizer';
 import { Token } from './tokens/core/Token';
@@ -10,6 +11,8 @@ export class Template {
     readonly dir?: string;
     tokens?: Token[];
 
+    private static readonly fileCache: Cache<Template> = new MruCache<Template>();
+
     constructor(content: string, tokenizer: Tokenizer, dir?: string, tokens?: Token[]) {
         this.content = content;
         this.tokenizer = tokenizer;
@@ -17,7 +20,7 @@ export class Template {
         this.tokens = tokens;
     }
 
-    compile() {
+    compile(): Token[] {
         if (!this.tokens) {
             this.tokens = this.tokenizer.tokenize(this.content, this);
         }
@@ -25,19 +28,23 @@ export class Template {
     }
 
     async render(model: RenderModel): Promise<string> {
-        const tokens = this.tokens || this.compile();
-        return Token.renderTokens(tokens, model);
+        return Token.renderTokens(this.compile(), model);
     }
 
     static async fromFile(filePath: string, tokenizer: Tokenizer, cwd?: string): Promise<Template> {
         const absPath = path.isAbsolute(filePath) || typeof cwd !== 'string'
             ? filePath
             : path.join(cwd, filePath);
-        const contents: string = await new Promise((resolve, reject) => {
-            fs.readFile(path.resolve(absPath), 'utf8', (err, data) => err ? reject(err) : resolve(data));
+
+        const template = Template.fileCache.getOrPut(absPath, async () => {
+            const contents: string = await new Promise((resolve, reject) => {
+                fs.readFile(path.resolve(absPath), 'utf8', (err, data) => err ? reject(err) : resolve(data));
+            });
+    
+            return new Template(contents, tokenizer, path.dirname(absPath));
         });
 
-        return new Template(contents, tokenizer, path.dirname(absPath));
+        return template;
     }
 
     static async fromString(content: string, tokenizer: Tokenizer): Promise<Template> {

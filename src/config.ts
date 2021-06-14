@@ -29,7 +29,7 @@ export const defaultConfig: OutieConfig = {
         'if': IfToken,
         'unless': UnlessToken,
         'for': ForToken,
-    }
+    },
 };
 
 export const getConfig = (userConfig: Partial<OutieConfig> = {}) => {

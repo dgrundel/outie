@@ -6,6 +6,7 @@ export declare class Template {
     readonly tokenizer: Tokenizer;
     readonly dir?: string;
     tokens?: Token[];
+    private static readonly fileCache;
     constructor(content: string, tokenizer: Tokenizer, dir?: string, tokens?: Token[]);
     compile(): Token[];
     render(model: RenderModel): Promise<string>;
